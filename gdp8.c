@@ -10,9 +10,9 @@
 
 /* 有沒有從命名看出我在向什麼公司的什麼電腦致敬？ */
 
-/* 發展方向：
+/* 大致架構：
  * 多累加器，32 Bit 機器字，20 Bit 定址
- * 中斷，指令權限區分
+ * 中斷，指令權限區分，無虛擬記憶體
  */
 
 #include <signal.h>
@@ -21,18 +21,6 @@
 #include <unistd.h>
 #include <wchar.h>
 #include <wctype.h>
-
-#ifdef DEBUG
-#  define DEBUG_OUTPUT \
-	fprintf(stderr, "PC=%x AC0=%x AC1=%x AC2=%x AC3=%x AC4=%x AC5=%x AC6=%x AC7=%x MQ=%x L=%hx\nST=%hx\n" \
-			,   pc, ac[0], ac[1], ac[2], ac[3], ac[4], ac[5], ac[6], ac[7],   mq,  link,   status);
-#else
-#  define DEBUG_OUTPUT
-#endif
-
-#ifndef MEMSIZE
-#  define MEMSIZE 1024*1024*4
-#endif
 
 #define POWTWO(exp) \
 	(1 << exp)
@@ -45,7 +33,9 @@
  * STATUS:	狀態
  */
 
-/* Group 0, Data Multiplication, with Accumulator:
+/* Description of Instructions:
+ * 
+ * Group 0, Data Multiplication, with Accumulator:
  * 	OPR:	OPeRator, has many function
  * 	AND:	logic AND
  * 	OR:	logic OR
@@ -86,13 +76,14 @@
  * 	HCF:	Halt, and Catch Fire -- there's no way to resume
  * 	BUG:	Tell the VM that we are toasted
  */
+
 enum OpCode
 {
 /* Group 0, Data Multiplication, with Accumulator */
 	OPR=0x00, AND=0x01, OR=0x02, XOR=0x03,
 	LOAD=0x04, DEP=0x05, PSH=0x06, POP=0x07,
 /* Group 1, Data Multiplication, without Accumulator */
-	LLOAD=0x08, LADD=0x09, LDEP=0x0A
+	LLOAD=0x08, LADD=0x09, LDEP=0x0A,
 /* Group 2, Arithmetic Operation (Integer) */
 	ADD=0x0B, SUB=0x0C, MUL=0x0D, DVI=0x0E,
 	POW=0x0F, MOD=0x10, SQRT=0x11, LRTS=0x12,
@@ -181,30 +172,29 @@ typedef struct
 	uint32_t addr	:20;	/* Current Address */
 } status_t;
 
-typedef struct
-{
-	uint32_t upper	:16;
-	uint32_t lower	:16;
-} half_t;
-
 typedef union
 {
 	ac_instruction_t ac_inst;
 	instruction_t inst;
 	opr_instruction_t opr_inst;
 	io_instruction_t io_inst;
-	half_t half;
 	uint32_t word;
 } word_u;
 
 /* 32 Bit, Word Size */
 word_u ac[8], mq;
+#define AC(x) ac[x].word
+#define MQ mq.word
 status_t status, saved_status;
+#define STATUS status.word
 word_u *memory;
+#define MEM(x) memory[x].word
 /* 16 Bit, Special Register*/
 uint16_t l=0;
+#define L l
 /* 20 Bit, Memory Addressing */
 uint32_t pc=0;
+#define PC pc
 
 
 /* Corefile Format:
@@ -229,13 +219,14 @@ unsigned int read_core(FILE *fp)
 
 uint32_t to_address(uint32_t word)
 {
-	return word%MEMSIZE;
+	return word%1024*1024;
 }
 
-uint32_t indirect(uint32_t word)
-{
-	return memory[word%MEMSIZE].word;
-}
+#define TO_ADDRESS(x) \
+	(x % (1024*1024))
+
+#define INDIRECT(x) \
+	(memory[x % (1024*1024)].word)
 
 uint32_t rotl(uint32_t word, uint8_t count)
 {
@@ -247,108 +238,257 @@ uint32_t rotr(uint32_t word, uint8_t count)
 	return (word >> count)|(word << (32 - count));
 }
 
+uint16_t lrotl(uint32_t word, uint8_t count)
+{
+	return (word << count) | (word >> (16 - count));
+}
+
+uint16_t lrotr(uint32_t word, uint8_t count)
+{
+	return (word << count) | (word >> (16 - count));
+}
+
 void interrupt(void)
 {
-	memory[0x00000].word=pc;
-	pc=0x1;
+	MEM(0x00000)=PC;
+	PC=0x1;
+}
+
+void opr_word_increment(word_u code, short int that_ac)
+{
+	if(code.opr_inst.increment&&code.opr_inst.decrement)
+		l++;
+	else if(code.opr_inst.indirect)
+	{
+		if(code.opr_inst.increment)
+			MEM(TO_ADDRESS(AC(that_ac)))++;
+		if(code.opr_inst.decrement)
+			MEM(TO_ADDRESS(AC(that_ac)))--;
+	}
+	else
+	{
+		if(code.opr_inst.increment)
+			AC(that_ac)++;
+		if(code.opr_inst.decrement)
+			AC(that_ac)--;
+	}
+}
+
+void opr_bit_rotate(word_u code, short int that_ac)
+{
+	if(code.opr_inst.rotl)
+	{
+		if(code.opr_inst.indirect)
+			MEM(TO_ADDRESS(AC(that_ac))) =
+				rotl(MEM(to_address(AC(that_ac))), code.opr_inst.rott? 2: 1);
+		else
+			AC(code.opr_inst.accumulator) =
+				rotl(AC(that_ac), code.opr_inst.rott? 2: 1);
+	}
+	else if(code.opr_inst.rotr)
+	{
+		if(code.opr_inst.indirect)
+			MEM(TO_ADDRESS(AC(that_ac))) =
+				rotr(MEM(TO_ADDRESS(AC(that_ac))), code.opr_inst.rott? 2: 1);
+		else
+			AC(that_ac) =
+				rotr(AC(that_ac), code.opr_inst.rott? 2: 1);
+	}
+	if(code.opr_inst.rott && (! code.opr_inst.rotr) && (! code.opr_inst.rotl))
+	{
+		if(code.opr_inst.indirect)
+			MEM(TO_ADDRESS(AC(that_ac))) =
+				rotl(MEM(TO_ADDRESS(AC(that_ac))), 16);
+		else
+			AC(that_ac) = rotl(AC(that_ac), 16);
+	}
+}
+
+void opr_clear(word_u code, short int that_ac)
+{
+	if(code.opr_inst.clear)
+	{
+		if(code.opr_inst.indirect)
+			MEM(TO_ADDRESS(AC(that_ac)))=0;
+		else
+			AC(that_ac)=0;
+	}
+	if(code.opr_inst.clear_link)
+		L=0;
+	if(code.opr_inst.clear_mq)
+		MQ=0;
+}
+
+void opr_move_swap(word_u code, short int that_ac)
+{
+	uint32_t temp=0;
+	if(code.opr_inst.move_mq)
+	{
+		MQ=AC(that_ac);
+		AC(that_ac)=0;
+	}
+	if(code.opr_inst.swap_mq)
+	{
+		temp=AC(that_ac);
+		AC(that_ac)=MQ;
+		MQ=temp;
+	}
+	if(code.opr_inst.swap_link)
+	{
+		if(code.opr_inst.indirect)
+		{
+			temp=L;
+			L=(uint16_t) ((MEM(TO_ADDRESS(AC(that_ac)))) & 0x0000FFFF);
+			MEM(TO_ADDRESS(AC(that_ac)))= (MEM(TO_ADDRESS(AC(that_ac))) & 0xFFFF0000) + temp;
+		}
+		else
+		{
+			temp=L;
+			L=AC(that_ac) & 0x0000FFFF;
+			AC(that_ac)= (AC(that_ac) & 0xFFFF0000) + temp;
+		}
+	}
+}
+
+void opr_swap_link(word_u code, short int that_ac)
+{
+	uint32_t temp=0;
+	uint16_t half_temp=0;
+	if(code.opr_inst.swap_upper)
+	{
+		if(code.opr_inst.indirect)
+		{
+			temp = MEM(TO_ADDRESS(AC(that_ac))) & 0xFFFF0000;
+			MEM(TO_ADDRESS(AC(that_ac))) = temp + L;
+			L = temp >> 16;
+		}
+		else
+		{
+			temp = AC(that_ac) & 0xFFFF0000;
+			AC(that_ac) = temp + L;
+			L = temp >> 16;
+		}
+	}
+	if(code.opr_inst.swap_lower)
+	{
+		if(code.opr_inst.indirect)
+		{
+			half_temp = (uint16_t) (MEM(TO_ADDRESS(AC(that_ac))) & 0x0000FFFF);
+			MEM(TO_ADDRESS(AC(that_ac))) &= 0xFFFF0000;
+			MEM(TO_ADDRESS(AC(that_ac))) += L;
+			L = half_temp;
+		}
+		else
+		{
+			half_temp = (uint16_t) (AC(that_ac) & 0x0000FFFF);
+			AC(that_ac) &= 0xFFFF0000;
+			AC(that_ac) += L;
+			L = half_temp;
+		}
+	}
+}
+
+void opr_reverse(word_u code, short int that_ac)
+{
+	if(code.opr_inst.reverse_bits)
+	{
+		if(code.opr_inst.indirect)
+			MEM(TO_ADDRESS(AC(that_ac))) ^= 0x0;
+		else
+			AC(that_ac) ^= 0x0;
+	}
+	if(code.opr_inst.reverse_link_bits)
+		L ^= 0x0;
+}
+
+void opr_skip(word_u code, short int that_ac)
+{
+	if(code.opr_inst.reverse)
+	{
+		if(code.opr_inst.if_non_zero)
+		{
+			if(code.opr_inst.indirect)
+				if(MEM(TO_ADDRESS(AC(that_ac))) == 0)
+					++PC;
+			else
+				if(AC(that_ac) == 0)
+					++PC;
+		}
+		if(code.opr_inst.if_link_non_zero)
+		{
+			if(L == 0)
+				++PC;
+		}
+		if(code.opr_inst.if_negative)
+		{
+			if(code.opr_inst.indirect)
+				if((MEM(TO_ADDRESS(AC(ac_that))) & 0x80000000) == 0)
+					++PC;
+			else
+				if((AC(ac_that) & 0x80000000) == 0)
+					++PC;
+		}
+	}
+	else
+	{
+		if(code.opr_inst.if_non_zero)
+		{
+			if(code.opr_inst.indirect)
+				if(MEM(TO_ADDRESS(AC(that_ac))) != 0)
+					++PC;
+			else
+				if(AC(that_ac) != 0)
+					++PC;
+		}
+		if(code.opr_inst.if_link_non_zero)
+			if(L)
+				++PC;
+		if(code.opr_inst.if_negative)
+		{
+			if(code.opr_inst.indirect)
+				 if((MEM(TO_ADDRESS(AC(ac_that))) & 0x80000000) != 0)
+					++PC;
+			else
+				if((AC(ac_that) & 0x80000000) != 0)
+					++PC;
+		}
+	}
 }
 
 void interpret(word_u code)
 {
-	uint32_t temp=0x00000000;
-	uint16_t half_temp=0x0000;
 	if(code.inst.opcode == OPR)
 	{
-		if(code.opr_inst.clear)
-		{
-			if(code.opr_inst.indirect)
-				memory[ac[code.opr_inst.accumulator].word%MEMSIZE].word=0;
-			else
-				ac[code.opr_inst.accumulator].word=0;
-		}
-		if(code.opr_inst.clear_link)
-			l=0;
-		if(code.opr_inst.clear_mq)
-			mq.word=0;
-		if(code.opr_inst.move_mq)
-		{
-			ac[code.opr_inst.accumulator].word=0;
-			mq.word=0;
-		}
-		if(code.opr_inst.swap_mq)
-		{
-			temp=ac[code.opr_inst.accumulator].word;
-			ac[code.opr_inst.accumulator].word=mq.word;
-			mq.word=temp;
-		}
-		if(code.opr_inst.swap_link)
-		{
-			if(code.opr_inst.indirect)
-			{
-				temp=l;
-				l=(memory[to_address(ac[code.opr_inst.accumulator].word)].word)%POWTWO(16);
-				memory[ac[code.opr_inst.accumulator].word%MEMSIZE].half.lower=temp;
-			}
-			else
-			{
-				temp=l;
-				l=ac[code.opr_inst.accumulator].half.lower;
-				ac[code.opr_inst.accumulator].half.lower=temp;
-			}
-		}
-		else if(code.opr_inst.rotl)
-		{
-			if(code.opr_inst.indirect)
-				memory[to_address(ac[code.opr_inst.accumulator].word)].word =
-					rotl(memory[to_address(ac[code.opr_inst.accumulator].word)].word, code.opr_inst.rott? 2: 1);
-			else
-				ac[code.opr_inst.accumulator].word =
-					rotl(ac[code.opr_inst.accumulator].word, code.opr_inst.rott? 2: 1);
-		}
-		else if(code.opr_inst.rotr)
-		{
-			if(code.opr_inst.indirect)
-				memory[to_address(ac[code.opr_inst.accumulator].word)].word =
-					rotr(memory[to_address(ac[code.opr_inst.accumulator].word)].word, code.opr_inst.rott? 2: 1);
-			else
-				ac[code.opr_inst.accumulator].word =
-					rotr(ac[code.opr_inst.accumulator].word, code.opr_inst.rott? 2: 1);
-		}
-		if(code.opr_inst.rott && (! code.opr_inst.rotr) && (! code.opr_inst.rotl))
-		{
-			if(code.opr_inst.indirect)
-				memory[to_address(ac[code.opr_inst.accumulator].word)].word =
-					rotl(memory[to_address(ac[code.opr_inst.accumulator].word)].word, 16);
-			else
-				ac[code.opr_inst.accumulator].word = rotl(ac[code.opr_inst.accumulator].word, 16);
-		}
-		if(code.opr_inst.increment&&code.opr_inst.decrement)
-			l++;
-		else if(code.opr_inst.indirect)
-		{
-			if(code.opr_inst.increment)
-				memory[to_address(ac[code.opr_inst.accumulator].word)].word++;
-			if(code.opr_inst.decrement)
-				memory[to_address(ac[code.opr_inst.accumulator].word)].word--;
-		}
-		else
-		{
-			if(code.opr_inst.increment)
-				ac[code.opr_inst.accumulator].word++;
-			if(code.opr_inst.decrement)
-				ac[code.opr_inst.accumulator].word--;
-		}
-
+		opr_clear(code, code.opr_inst.accumulator);
+		opr_move_swap(code, code.opr_inst.accumulator);
+		opr_bit_rotate(code, code.opr_inst.accumulator);
+		opr_word_increment(code, code.opr_inst.accumulator);
+		opr_swap_link(code, code.opr_inst.accumulator);
+		opr_reverse(code, code.opr_inst.accumulator);
+		opr_skip(code, code.opr_inst.accumulator);
+		if(code.opr_inst.buttons) /* Currently Does nothing */
+			AC(code.opr_inst.accumulator)=0;
+	return;
 	}
-
+	switch(code.inst.opcode)
+	{
+		case AND:
+		case OR:
+		case XOR:
+		case LOAD:
+		case DEP:
+		case PSH:
+		case POP:
+		default:
+			return;
+	}
 }
 
 int main (int argc, char **argv)
 {
-	word_u *memory=calloc(1024*1024, 4);
+	memory=calloc(1024*1024, 4);
 	FILE *corefile;
 	int opt;
-	memory=malloc(MEMSIZE); /* 20 Bit Addressing, 4 Bytes per Word */
 	while((opt = getopt(argc, argv, "hf:s:")) != -1)
 	{
 		switch(opt)
