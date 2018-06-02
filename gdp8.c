@@ -89,22 +89,21 @@
 enum OpCode
 {
 /* Group 0, Data Multiplication, with Accumulator */
-	OPR, AND, OR, XOR,
-	LOAD, DEP, PSH, POP,
+	OPR=0x00, AND=0x01, OR=0x02, XOR=0x03,
+	LOAD=0x04, DEP=0x05, PSH=0x06, POP=0x07,
 /* Group 1, Data Multiplication, without Accumulator */
-	LLOAD, LADD,
-	LDEP,
+	LLOAD=0x08, LADD=0x09, LDEP=0x0A
 /* Group 2, Arithmetic Operation (Integer) */
-	ADD, SUB, MUL, DVI,
-	POW, MOD, SQRT, LRTS,
-	ARTS, NMI,
+	ADD=0x0B, SUB=0x0C, MUL=0x0D, DVI=0x0E,
+	POW=0x0F, MOD=0x10, SQRT=0x11, LRTS=0x12,
+	ARTS=0x13, NMI=0x14,
 /* Group 3, Flow Control */
-	JMP, JMS, CMP, CJMP,
-	CJMS, CSKIP, CALL, RET,
+	JMP=0x15, JMS=0x16, CMP=0x17, CJMP=0x18,
+	CJMS=0x19, CSKIP=0x1A, CALL=0x1B, RET=0x1C,
 /* Group 4, I/O */
-	IN, OUT,
+	IN=0x1D, OUT=0x1E,
 /* Group 5, Special */
-	HLT, HCF, BUG
+	EUM=0x1F, HLT=0x20, HCF=0x21, BUG=0xFF
 };
 
 /* 指令格式 */
@@ -138,11 +137,12 @@ typedef struct
 	uint32_t move_mq	:1;	/* Move the Word into MQ */
 	uint32_t swap_mq	:1;	/* Swap the Word and MQ */
 	uint32_t swap_link	:1;	/* Swap the Link and the lower half of the Word */
-	uint32_t rotr		:1;	/* Rotate the Word Right */
-	uint32_t rotl		:1;	/* Rotate the Word Left */
-	uint32_t byteswap	:1;	/* Swap the lower and the upper 16 Bit of the Word */
-	uint32_t byteswap_link	:1;	/* Swap the lower and the upper 8 Bit of the Link */
-	uint32_t swap		:1;	/* Swap the lower 16 Bit of the Word and the Link */
+	uint32_t rotr	:1;	/* Rotate the Word Right */
+	uint32_t rotl	:1;	/* Rotate the Word Left */
+	uint32_t rott	:1;	/* Rotate 2 Bits, if both rotr and rotl isn't set, swap lower and upper 16Bit of the Word */
+	uint32_t increment	:1;	/* Increment the Word, if both increment and decrement is set, increment the Link */
+	uint32_t decrement	:1;	/* Decrement the Word */
+	uint32_t swap_lower	:1;	/* Swap the lower 16 Bit of the Word and the Link */
 	uint32_t swap_upper	:1;	/* Swap the upper 16 Bit of the Word and the Link */
 	uint32_t reverse_bits	:1;	/* Reverse the bits of the Word */
 	uint32_t reverse_link_bits	:1;	/* Reverse the bits of the Link */
@@ -151,7 +151,6 @@ typedef struct
 	uint32_t if_link_non_zero	:1;	/* Skip if the Link is 0x0000 */
 	uint32_t if_negative	:1;	/* Skip if the Word is negative */
 	uint32_t buttons	:1;	/* Store the content of Panel Buttons into the Word */
-	uint32_t halt	:1;	/* Halt */
 } opr_instruction_t;
 
 /* I/O 指令格式 */
@@ -297,27 +296,47 @@ void interpret(word_u code)
 				ac[code.opr_inst.accumulator].half.lower=temp;
 			}
 		}
-		if(code.opr_inst.increment)
+		else if(code.opr_inst.rotl)
 		{
 			if(code.opr_inst.indirect)
-				++memory[to_address(ac[code.opr_inst.accumulator].word)].word;
+				memory[to_address(ac[code.opr_inst.accumulator].word)].word =
+					rotl(memory[to_address(ac[code.opr_inst.accumulator].word)].word, code.opr_inst.rott? 2: 1);
 			else
-				++ac[code.opr_inst.accumulator].word;
+				ac[code.opr_inst.accumulator].word =
+					rotl(ac[code.opr_inst.accumulator].word, code.opr_inst.rott? 2: 1);
 		}
-		if(code.opr_inst.decrement)
+		else if(code.opr_inst.rotr)
 		{
 			if(code.opr_inst.indirect)
-				--memory[to_address(ac[code.opr_inst.accumulator].word)].word;
+				memory[to_address(ac[code.opr_inst.accumulator].word)].word =
+					rotr(memory[to_address(ac[code.opr_inst.accumulator].word)].word, code.opr_inst.rott? 2: 1);
 			else
-				--ac[code.opr_inst.accumulator].word;
+				ac[code.opr_inst.accumulator].word =
+					rotr(ac[code.opr_inst.accumulator].word, code.opr_inst.rott? 2: 1);
 		}
-		if(code.opr_inst.byteswap)
+		if(code.opr_inst.rott && (! code.opr_inst.rotr) && (! code.opr_inst.rotl))
 		{
 			if(code.opr_inst.indirect)
 				memory[to_address(ac[code.opr_inst.accumulator].word)].word =
 					rotl(memory[to_address(ac[code.opr_inst.accumulator].word)].word, 16);
 			else
 				ac[code.opr_inst.accumulator].word = rotl(ac[code.opr_inst.accumulator].word, 16);
+		}
+		if(code.opr_inst.increment&&code.opr_inst.decrement)
+			l++;
+		else if(code.opr_inst.indirect)
+		{
+			if(code.opr_inst.increment)
+				memory[to_address(ac[code.opr_inst.accumulator].word)].word++;
+			if(code.opr_inst.decrement)
+				memory[to_address(ac[code.opr_inst.accumulator].word)].word--;
+		}
+		else
+		{
+			if(code.opr_inst.increment)
+				ac[code.opr_inst.accumulator].word++;
+			if(code.opr_inst.decrement)
+				ac[code.opr_inst.accumulator].word--;
 		}
 
 	}
