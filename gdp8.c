@@ -183,19 +183,19 @@ typedef union
 
 /* 32 Bit, Word Size */
 word_u ac[8], mq;
-#define AC(x) ac[x].word
-#define MQ mq.word
 status_t status, saved_status;
-#define STATUS status.word
 word_u *memory;
-#define MEM(x) memory[x].word
 /* 16 Bit, Special Register*/
 uint16_t l=0;
-#define L l
 /* 20 Bit, Memory Addressing */
 uint32_t pc=0;
-#define PC pc
 
+#define AC(x) ac[x].word
+#define MQ mq.word
+#define STATUS status.word
+#define MEM(x) memory[x].word
+#define L l
+#define PC pc
 
 /* Corefile Format:
  * "01234:56789ABC"
@@ -472,6 +472,7 @@ void interpret(word_u code)
 	}
 	switch(code.inst.opcode)
 	{
+	/* Group 0 */
 		case AND:
 		case OR:
 		case XOR:
@@ -479,6 +480,11 @@ void interpret(word_u code)
 		case DEP:
 		case PSH:
 		case POP:
+	/* Group 1 */
+	/* Group 2 */
+	/* Group 3 */
+	/* Group 4 */
+	
 		default:
 			return;
 	}

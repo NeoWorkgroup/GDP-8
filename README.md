@@ -1,4 +1,4 @@
-# Neo_Chen's Weird Simple 32 Bit Virtual Machine (WIP)
+# Neo_Chen's Simple 32 Bit DEC PDP-8 Like Virtual Machine (WIP)
 ## Simple as DEC PDP-8/E
 
 All Document is in the source code.  
