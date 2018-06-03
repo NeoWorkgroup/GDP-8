@@ -31,9 +31,8 @@
  * PC:	程式計數器(Program Counter)
  * L:	The Link
  * STATUS:	狀態
- */
-
-/* Description of Instructions:
+ *
+ * Description of Instructions:
  * 
  * Group 0, Data Multiplication, with Accumulator:
  * 	OPR:	OPeRator, has many function
@@ -149,7 +148,7 @@ typedef struct
 {
 	uint32_t opcode	:8;	/* Either IN or OUT */
 	uint32_t indirect	:1;	/* Indirect Reference (From Accumulator[0]) */
-	uint32_t flags	:3;
+	uint32_t flags	:3;	/* Yes, it is "Flags" */
 	uint32_t address	:20;	/* Data Address */
 } io_instruction_t;
 
@@ -157,9 +156,12 @@ typedef struct
  * Status Code:
  * 	0:	No Error
  * 	1:	System Call
- * 	2:	HLT, HCF, BUG, IN, OUT Executed in Usermode
+ * 	2:	IN, OUT Executed in Usermode
  * 	3:	Device Error
  * 	4:	Illegal Instruction
+ * 	5:	BUG Triggered in Usermode
+ * 	6:	HLT in Usermode (Ends the program)
+ * 	7:	WE ARE TOASTED!! (BUG in Kernel Space: KERNEL PANIC)
  */
 
 typedef struct
@@ -473,6 +475,14 @@ void or(short int that_ac, int indirect, uint32_t that_mem)
 		AC(that_ac) |= MEM(TO_ADDRESS(that_mem));
 }
 
+void xor(short int that_ac, int indirect, uint32_t that_mem)
+{
+	if(indirect)
+		AC(that_ac) ^= MEM(TO_ADDRESS(MEM(that_mem)));
+	else
+		AC(that_ac) ^= MEM(TO_ADDRESS(that_mem));
+}
+
 void load(short int that_ac, int indirect, uint32_t that_mem)
 {
 	if(indirect)
@@ -489,6 +499,22 @@ void dep(short int that_ac, int indirect, uint32_t that_mem)
 		MEM(that_mem) = AC(that_ac);
 }
 
+void psh(short int that_ac, int indirect, uint32_t that_mem)
+{
+	if(indirect)
+		AC(that_ac) = MEM(TO_ADDRESS(MEM(that_mem)));
+	else
+		AC(that_ac) = MEM(that_mem);
+	AC(that_ac)--;
+}
+
+void pop(short int that_ac, int indirect, uint32_t that_mem)
+{
+	if(indirect)
+		MEM(TO_ADDRESS(MEM(that_mem))) = AC(that_ac)++;
+	else
+		MEM(that_mem) = AC(that_ac)++;
+}
 
 void interpret(word_u code)
 {
@@ -512,11 +538,23 @@ void interpret(word_u code)
 			and(code.ac_inst.accumulator, code.inst.indirect, code.inst.addr);
 			break;
 		case OR:
+			or(code.ac_inst.accumulator, code.inst.indirect, code.inst.addr);
+			break;
 		case XOR:
+			xor(code.ac_inst.accumulator, code.inst.indirect, code.inst.addr);
+			break;
 		case LOAD:
+			load(code.ac_inst.accumulator, code.inst.indirect, code.inst.addr);
+			break;
 		case DEP:
+			dep(code.ac_inst.accumulator, code.inst.indirect, code.inst.addr);
+			break;
 		case PSH:
+			psh(code.ac_inst.accumulator, code.inst.indirect, code.inst.addr);
+			break;
 		case POP:
+			pop(code.ac_inst.accumulator, code.inst.indirect, code.inst.addr);
+			break;
 	/* Group 1 */
 	/* Group 2 */
 	/* Group 3 */
