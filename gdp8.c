@@ -196,6 +196,11 @@ uint32_t pc=0;
 #define MEM(x) memory[x].word
 #define L l
 #define PC pc
+#define TO_ADDRESS(x) \
+	(x % (1024*1024))
+
+#define INDIRECT(x) \
+	(memory[x % (1024*1024)].word)
 
 /* Corefile Format:
  * "01234:56789ABC"
@@ -217,17 +222,6 @@ unsigned int read_core(FILE *fp)
 	return readed;
 }
 
-uint32_t to_address(uint32_t word)
-{
-	return word%1024*1024;
-}
-
-#define TO_ADDRESS(x) \
-	(x % (1024*1024))
-
-#define INDIRECT(x) \
-	(memory[x % (1024*1024)].word)
-
 uint32_t rotl(uint32_t word, uint8_t count)
 {
 	return (word << count) | (word >> (32 - count));
@@ -236,16 +230,6 @@ uint32_t rotl(uint32_t word, uint8_t count)
 uint32_t rotr(uint32_t word, uint8_t count)
 {
 	return (word >> count)|(word << (32 - count));
-}
-
-uint16_t lrotl(uint32_t word, uint8_t count)
-{
-	return (word << count) | (word >> (16 - count));
-}
-
-uint16_t lrotr(uint32_t word, uint8_t count)
-{
-	return (word << count) | (word >> (16 - count));
 }
 
 void interrupt(void)
@@ -280,7 +264,7 @@ void opr_bit_rotate(word_u code, short int that_ac)
 	{
 		if(code.opr_inst.indirect)
 			MEM(TO_ADDRESS(AC(that_ac))) =
-				rotl(MEM(to_address(AC(that_ac))), code.opr_inst.rott? 2: 1);
+				rotl(MEM(TO_ADDRESS(AC(that_ac))), code.opr_inst.rott? 2: 1);
 		else
 			AC(code.opr_inst.accumulator) =
 				rotl(AC(that_ac), code.opr_inst.rott? 2: 1);
@@ -408,11 +392,15 @@ void opr_skip(word_u code, short int that_ac)
 		if(code.opr_inst.if_non_zero)
 		{
 			if(code.opr_inst.indirect)
+			{
 				if(MEM(TO_ADDRESS(AC(that_ac))) == 0)
 					++PC;
+			}
 			else
+			{
 				if(AC(that_ac) == 0)
 					++PC;
+			}
 		}
 		if(code.opr_inst.if_link_non_zero)
 		{
@@ -422,11 +410,15 @@ void opr_skip(word_u code, short int that_ac)
 		if(code.opr_inst.if_negative)
 		{
 			if(code.opr_inst.indirect)
-				if((MEM(TO_ADDRESS(AC(ac_that))) & 0x80000000) == 0)
+			{
+				if((MEM(TO_ADDRESS(AC(that_ac))) & 0x80000000) == 0)
 					++PC;
+			}
 			else
-				if((AC(ac_that) & 0x80000000) == 0)
+			{
+				if((AC(that_ac) & 0x80000000) == 0)
 					++PC;
+			}
 		}
 	}
 	else
@@ -434,26 +426,69 @@ void opr_skip(word_u code, short int that_ac)
 		if(code.opr_inst.if_non_zero)
 		{
 			if(code.opr_inst.indirect)
+			{
 				if(MEM(TO_ADDRESS(AC(that_ac))) != 0)
 					++PC;
+			}
 			else
+			{
 				if(AC(that_ac) != 0)
 					++PC;
+			}
 		}
 		if(code.opr_inst.if_link_non_zero)
+		{
 			if(L)
 				++PC;
+		}
 		if(code.opr_inst.if_negative)
 		{
 			if(code.opr_inst.indirect)
-				 if((MEM(TO_ADDRESS(AC(ac_that))) & 0x80000000) != 0)
+			{
+				if((MEM(TO_ADDRESS(AC(that_ac))) & 0x80000000) != 0)
 					++PC;
+			}
 			else
-				if((AC(ac_that) & 0x80000000) != 0)
+			{
+				if((AC(that_ac) & 0x80000000) != 0)
 					++PC;
+			}
 		}
 	}
 }
+
+void and(short int that_ac, int indirect, uint32_t that_mem)
+{
+	if(indirect)
+		AC(that_ac) &= MEM(TO_ADDRESS(MEM(that_mem)));
+	else
+		AC(that_ac) &= MEM(that_mem);
+}
+
+void or(short int that_ac, int indirect, uint32_t that_mem)
+{
+	if(indirect)
+		AC(that_ac) |= MEM(TO_ADDRESS(MEM(that_mem)));
+	else
+		AC(that_ac) |= MEM(TO_ADDRESS(that_mem));
+}
+
+void load(short int that_ac, int indirect, uint32_t that_mem)
+{
+	if(indirect)
+		AC(that_ac) = MEM(TO_ADDRESS(MEM(that_mem)));
+	else
+		AC(that_ac) = MEM(that_mem);
+}
+
+void dep(short int that_ac, int indirect, uint32_t that_mem)
+{
+	if(indirect)
+		MEM(TO_ADDRESS(MEM(that_mem))) = AC(that_ac);
+	else
+		MEM(that_mem) = AC(that_ac);
+}
+
 
 void interpret(word_u code)
 {
@@ -474,6 +509,8 @@ void interpret(word_u code)
 	{
 	/* Group 0 */
 		case AND:
+			and(code.ac_inst.accumulator, code.inst.indirect, code.inst.addr);
+			break;
 		case OR:
 		case XOR:
 		case LOAD:
