@@ -379,9 +379,9 @@ void opr_reverse(word_u code, short int that_ac)
 	if(code.opr_inst.reverse_bits)
 	{
 		if(code.opr_inst.indirect)
-			MEM(TO_ADDRESS(AC(that_ac))) ^= 0x0;
+			MEM(TO_ADDRESS(AC(that_ac))) ^= 0xFFFFFFFF;
 		else
-			AC(that_ac) ^= 0x0;
+			AC(that_ac) ^= 0xFFFFFFFF;
 	}
 	if(code.opr_inst.reverse_link_bits)
 		L ^= 0x0;
@@ -447,12 +447,12 @@ void opr_skip(word_u code, short int that_ac)
 		{
 			if(code.opr_inst.indirect)
 			{
-				if((MEM(TO_ADDRESS(AC(that_ac))) & 0x80000000) != 0)
+				if((MEM(TO_ADDRESS(AC(that_ac))) & 0x80000000) != 0) /* The highest bit */
 					++PC;
 			}
 			else
 			{
-				if((AC(that_ac) & 0x80000000) != 0)
+				if((AC(that_ac) & 0x80000000) != 0) /* Same as above */
 					++PC;
 			}
 		}
