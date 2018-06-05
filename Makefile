@@ -1,6 +1,6 @@
 CC = clang
 CFLAGS_OPT = -Ofast -gfull -gdwarf-5 -Wall -Wextra -pipe -static -march=native -fPIE -flto -I.
-CLFAGS=-O2 -gfull -pipe -lm
+CLFAGS=-O2 -gfull -pipe -I.
 
 all: gdp8
 
