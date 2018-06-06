@@ -15,6 +15,17 @@
 #include <wchar.h>
 #include <wctype.h>
 
+#define TRUE	1
+#define FALSE	0
+#define I_TRUE	1	/* Indirect */
+#define I_FALSE	0
+#define INC_TRUE	1	/* Increment */
+#define INC_FALSE	0
+#define DEC_TRUE	1	/* Decrement */
+#define DEC_FALSE	0
+#define BEFORE	0	/* Order */
+#define AFTER	1
+
 #define AC(x) ac[x].word
 #define MQ mq.word
 #define STATUS status.word
@@ -23,9 +34,6 @@
 #define PC pc
 #define TO_ADDRESS(x) \
 	(x % (1024*1024))
-
-#define INDIRECT(x) \
-	(memory[x % (1024*1024)].word)
 
 #define POWTWO(exp) \
 	(1 << exp)

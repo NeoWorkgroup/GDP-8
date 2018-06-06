@@ -32,6 +32,50 @@ uint16_t l=0;
 /* 20 Bit, Memory Addressing */
 uint32_t pc=0;
 
+uint32_t read_mem(int indirect, int order, int increment, int decrement, uint32_t address)
+{
+	if(increment || decrement)
+	{
+		if(order=BEFORE)
+		{
+			if(indirect)
+			{
+				if(increment)
+					return MEM(TO_ADDRESS(++MEM(address)));
+				else if(decrement)
+					return MEM(TO_ADDRESS(--MEM(address)));
+			}
+			else
+			{
+				if(increment)
+					return ++MEM(address);
+				else if(decrement)
+					return --MEM(address);
+			}
+		}
+		if(order=AFTER)
+		{
+			if(indirect)
+			{
+				if(increment)
+					return MEM(TO_ADDRESS(MEM(address)))++;
+				else if(decrement)
+					return MEM(TO_ADDRESS(MEM(address)))--;
+			}
+			else
+			{
+				if(increment)
+					return MEM(address)++;
+				else if(decrement)
+					return MEM(address)--;
+			}
+		}
+	}
+	if(indirect)
+		return MEM(TO_ADDRESS(MEM(address)));
+	else
+		return MEM(address);
+}
 
 void opr_word_increment(word_u code, short int that_ac)
 {
