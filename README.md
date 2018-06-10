@@ -1,8 +1,8 @@
-# Neo_Chen's 32 Bit DEC PDP-8 Like Virtual Machine (WIP)
+# Neo_Chen's 16 Bit DEC PDP-8 Like Virtual Machine (WIP)
 
 ## 簡短介紹：
 
-DCC GDP-8 是一個模仿 DEC PDP-8 的虛擬機，使用 32 位元機器字，20 位元記憶體定址。
+DCC GDP-8 是一個模仿 DEC PDP-8 的虛擬機，使用 16 位元機器字，16 位元記憶體定址，外加 4 位元的分段。
 ，本專案的目標是創造現代的「迷你電腦」(Mini Computer)，就和 DEC 的 PDP-8/E 或
 PDP-11/70 一樣。
 
