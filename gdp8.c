@@ -11,7 +11,7 @@
 /* 有沒有從命名看出我在向什麼公司的什麼電腦致敬？ */
 
 /* 大致架構：
- * 單累加器，16 Bit 機器字，16 Bit 定址，加上 8 Bit 分段
+ * 累加器，16 Bit 機器字，16 Bit 定址，加上 8 Bit 分段
  * 中斷，指令權限區分，無虛擬記憶體
  */
 
@@ -22,9 +22,9 @@
 #include <libgdp8.h>
 
 /* 16 Bit, Word Size */
-int16_t ac=0, mq=0;
-int16_t st=0, sf=0; /* Status and Save Field */
-word_u *memory;
+uint16_t ac=0, mq=0;
+uint16_t st=0, sf=0; /* Status and Save Field */
+uint16_t *memory;
 /* 16 Bit, Memory Addressing (and 8 bit field) */
 uint16_t pc=0;
 /* Code Field and Data Field */
@@ -40,7 +40,7 @@ int main (int argc, char **argv)
 		switch(opt)
 		{
 			case 's':
-				sscanf(optarg, "%x", &pc);
+				sscanf(optarg, "%hx", &pc);
 				break;
 			case 'f':
 				if((corefile = fopen(optarg, "r")) == NULL)

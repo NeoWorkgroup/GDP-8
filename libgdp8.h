@@ -101,16 +101,17 @@
  * DIT:	Disabled Interrupt
  * UM:	Usermode
  * STAT:	Status Code
+ * Effective Field:	Current Code Field or Data Field depending on L is 0 or 1
  *
  * Status Code:
  * 0:	No Error
  * 1:	Encountered Interrupt
- * 2:	Trap
- * 3:	Illegal Instruction
- * 4:	HLT in Usermode
+ * 2:	System Call
+ * 3:	Trap
+ * 4:	HLT, BUG in Usermode
  * 5:	IOT, OSR in Usermode
  * 6:	Cross Field JMP, JMS Usermode
- * 7:	Illegal IOT Port, or Code
+ * 7:	BUG in Kernel Mode, KERNEL PANIC
  *
  * Saved Field Format:
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -118,6 +119,28 @@
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  * |      C O D E   F I E L D      |      D A T A   F I E L D      |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ */
+
+/* Instructions:
+ *
+ * OP	NAME		DESCRIPTION
+ * 
+ * 0	AND		AND AC with the Target
+ * 1	ADD		ADD the Accumulator with the Target
+ * 2	ASZ		ADD the Target, and skip next instruction if result is zero
+ * 3	DEP		Deposit the Accumulator into the Target
+ * 4	JMS		Jump to the Subroutine
+ * 5	JMP		Jump to the Target
+ * 6	IOT		I/O Transfer
+ * 7	OPR		Operation
+ * 8	PUSH		Push into Stack
+ * 9	POP		Pop off Stack
+ * A	CALL		Call function
+ * B	RET		Return
+ * C	EUM		Enter Usermode at the Address
+ * D	INT		Interrupt, same Format as IOT
+ * E	SYS		System Call, same Format as IOT, triggers a Interrupt
+ * F	BUG		Tell the system, there is a bug at the address
  */
 
 /* Corefile Format:
@@ -128,26 +151,27 @@
 
 void load_core(FILE *fp)
 {
+	extern uint16_t *memory;
 	uint16_t word=0;
-	uint16_t addr=0;
+	uint32_t addr=0;
 	uint8_t field=0;
 	uint32_t readed=0;
-	while(fscanf(fp, "%x:%x\n", &addr, &word) != EOF)
+	while(fscanf(fp, "%x:%hx\n", &addr, &word) != EOF)
 	{
 		field=(addr&0xFF0000) >> 16;
 		addr&=0x00FFFFFF;
-		memory[FADDR(field, addr)]=word;
+		MEM(FADDR(field, addr))=word;
 		readed++;
 	}
 }
 
 void dump_core(FILE *fp)
 {
-	uint32_t word=0;
-	uint16_t addr=0;
-	for(addr=0; addr =< 0xffff; addr++)
+	uint16_t word=0;
+	uint32_t addr=0;
+	for(addr=0; addr <= 0xFFFFFF; addr++)
 	{
-		fprintf(fp, "%06x:%04hx\n", addr, word)
+		fprintf(fp, "%06x:%04hx\n", addr, word);
 	}
 }
 
@@ -163,6 +187,7 @@ uint16_t rotr(uint16_t word, uint8_t count)
 
 void interrupt(uint32_t addr)
 {
+	extern uint16_t *memory, pc;
 	MEM(0x00000)=addr;
 	PC=0x1;
 }
