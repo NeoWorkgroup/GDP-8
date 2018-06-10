@@ -15,58 +15,114 @@
 #define TRUE	1
 #define FALSE	0
 
-#define AC ac.word
-#define MQ mq.word
-#define STATUS status.word
-#define MEM(x) memory[x].word
+#define AC ac
+#define MQ mq
+#define STATUS status
+#define MEM(x) memory[x]
 #define PC pc
-#define L l
+#define L status.l
 #define CF cf
 #define DF df
+
 #define SETL(x) \
 	(l=(x%2))
-
-#define TO_MEM(f, a) \
+/* Combine Field and Address */
+#define FADDR(f, a) \
 	((f << 16) | a)
 
+/* Get Page Address's Real Address */
+#define PADDR(pc, a) \
+	((pc&0xff0000)|a)
+
+/* Get Real Address */
+#define ADDR(field, pc, addr) \
+	((field << 16)|((pc&0xff0000)|addr))
+
+/* Power of 2 */
 #define POWTWO(exp) \
 	(1 << exp)
 
-/* 暫存器：
- * AC:	累加器(Accumulator)， 也被 PSH, POP, CALL, RET 當作是 Stack Pointer
- * MQ:	倍數/商數(Multiplier Quotient)
- * PC:	程式計數器(Program Counter)
+/* Registers:
+ * AC:	Accumulator
+ * MQ:	Multiplier Quotient
+ * PC:	Program Counter
  * L:	The Link
- * STATUS:	狀態
+ * STATUS:
  */
 
-/* 指令格式：
+/* Normal Instruction Format:
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |   4   |1|1|        10         |
+ * |   4   |1|1|1|      10         |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |  O P  |I|C|    A  D  D  R     |
+ * |  O P  |I|C|M|    A D D R      |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ * I:	Indirect
+ * C:	Current Page
+ * M:	Use MQ
+ */
+
+/* OPR Instruction Format:
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |       4       | 1 | 1 |   2   | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |     O   P     | I | M |  G:0  |   |   |   |   |   |   |   |   | Group 1
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |     O   P     | I | M |  G:1  |   |   |   |   |   |   |   |   | Group 2
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |     O   P     | I | M |  G:2  |   |   |   |   |   |   |   |   | Group 3
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |     O   P     | I | M |  G:3  |   |   |   |   |   |   |   |   | Group 4
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *
+ * I:	Indirect
+ * M:	Use MQ
+ * G:	Group 1, 2, 3, or 4
+ */
+
+/* IOT Instruction Format:
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |   4   |       8       |   4   |
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |  O P  |  D E V I C E  |C O D E|
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
-typedef struct
-{
-	uint16_t opcode	:4;	/* OpCode Number */
-	uint16_t indirect	:1;	/* Indirect */
-	uint16_t current	:1;	/* Use Current Page */
-	uint16_t addr	:10;	/* Address inside Page */
-} instruction_t;
-
-/* OPR 指令格式：
- * +-+-+-+-+---+---+---+---+---+---+---+---+---+---+---+---+
- * |   4   | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
- * +-+-+-+-+---+---+---+---+---+---+---+---+---+---+---+---+
- * |  O P  | I |   |   |   |   |   |   |   |   |   |   |   |
- * +-+-+-+-+---+---+---+---+---+---+---+---+---+---+---+---+
+/* Status Format:
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * | 1 | 1 | 1 | 1 | 1 |     3     |               8               |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * | L |G T|BIT|DIT|U M|  S T A T  |        EFFECTIVE FIELD        |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *
+ * L:	The Link
+ * GT:	Greater Than
+ * BIT:	Bus Interrupt
+ * DIT:	Disabled Interrupt
+ * UM:	Usermode
+ * STAT:	Status Code
+ *
+ * Status Code:
+ * 0:	No Error
+ * 1:	Encountered Interrupt
+ * 2:	Trap
+ * 3:	Illegal Instruction
+ * 4:	HLT in Usermode
+ * 5:	IOT, OSR in Usermode
+ * 6:	Cross Field JMP, JMS Usermode
+ * 7:	Illegal IOT Port, or Code
+ *
+ * Saved Field Format:
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |               8               |               8               |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |      C O D E   F I E L D      |      D A T A   F I E L D      |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  */
 
 /* Corefile Format:
- * "01234:56789ABC"
- * 20 Bit : 16 Bit Hexdecimal
+ * "012345:6789"
+ * 24 Bit : 16 Bit Hexdecimal
  * Any Invaild Input will be ignored
  */
 
@@ -80,7 +136,7 @@ void load_core(FILE *fp)
 	{
 		field=(addr&0xFF0000) >> 16;
 		addr&=0x00FFFFFF;
-		memory[TO_MEM(field, addr)]=word;
+		memory[FADDR(field, addr)]=word;
 		readed++;
 	}
 }

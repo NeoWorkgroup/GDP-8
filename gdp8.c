@@ -22,8 +22,8 @@
 #include <libgdp8.h>
 
 /* 16 Bit, Word Size */
-word_u ac, mq;
-status_t status;
+int16_t ac=0, mq=0;
+int16_t st=0, sf=0; /* Status and Save Field */
 word_u *memory;
 /* 16 Bit, Memory Addressing (and 8 bit field) */
 uint16_t pc=0;
