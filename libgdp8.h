@@ -21,6 +21,7 @@
 #define MEM(x) memory[x]
 #define PC pc
 #define L status.l
+#define SC sc
 #define CF cf
 #define DF df
 
@@ -32,67 +33,115 @@
 
 /* Get Page Address's Real Address */
 #define PADDR(pc, a) \
-	((pc&0xff0000)|a)
+	((pc&0xffff00)|a)
 
 /* Get Real Address */
 #define ADDR(field, pc, addr) \
-	((field << 16)|((pc&0xff0000)|addr))
+	((field << 16)|((pc&0xffff00)|addr))
 
 /* Power of 2 */
 #define POWTWO(exp) \
 	(1 << exp)
 
 /* Registers:
- * AC:	Accumulator
+ * AC0 ~ AC3:	Accumulator
  * MQ:	Multiplier Quotient
  * PC:	Program Counter
  * L:	The Link
- * STATUS:
+ * STATUS: Status
  */
 
 /* Normal Instruction Format:
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |   4   |1|1| 2 |       8       |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |  O P  |I|C| A |    A D D R    |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |       4       | 1 | 1 |   2   |               8               |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |      O P      | I | C |   A   |            A D D R            |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  * I:	Indirect
  * C:	Current Page
- * M:	Use MQ
+ * A:	Which Accumulator
+ */
+
+/* IOT Instruction Format:
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |       4       |               8               |       4       |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |      O P      |          D E V I C E          |    C O D E    |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  */
 
 /* OPR Instruction Format:
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |       4       | 1 | 1 |   2   | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+ * |       4       |   2   | 1 |   2   | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |     O   P     | I | M |  G:0  |   |   |   |   |   |   |   |   | Group 1
+ * |     O   P     |   A   | I |  G:0  |CLW|CLL|RVW|RVL|ROR|ROL|TWO| ==> Group 1
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |     O   P     | I | M |  G:1  |   |   |   |   |   |   |   |   | Group 2
+ * |     O   P     |   A   | I |  G:1  |CLW|IWC|SMW|SZW|SNL|REV|OSR| ==> Group 2
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |     O   P     | I | M |  G:2  |   |   |   |   |   |   |   |   | Group 3
+ * |     O   P     |   A   | I |  G:2  |CLW|MTW|WTM| Arithmetic OP | ==> Group 3
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |     O   P     | I | M |  G:3  |   |   |   |   |   |   |   |   | Group 4
+ * |     O   P     |   A   | I |  G:3  |INC|DEC|RNL|RNR|   N U M   | ==> Group 4
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  * I:	Indirect
- * M:	Use MQ
+ * A:	Which Accumulator
  * G:	Group 1, 2, 3, or 4
- */
-
-/* IOT Instruction Format:
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |   4   |       8       |   4   |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |  O P  |  D E V I C E  |C O D E|
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ * WORD:	if I=0, use AC, if I=1, use *AC
+ *
+ * CLW:	Clear WORD
+ * CLL:	Clear L
+ *
+ * RVW:	Reverse WORD
+ * RVL:	Reverse L
+ *
+ * ROR:	Rotate Right
+ * ROL:	Rotate Left
+ * TWO:	Rotate 2 Bits
+ *
+ * IWC:	Increment WORD
+ * OSR:	OR the content of Panel Buttons into WORD
+ *
+ * SMW:	Skip if WORD is negative
+ * SZW:	Skip if WORD is 0x0000
+ * SNL:	Skip if L is 0
+ * REV: Reverse the Condition of SMA, SZA, and SNL
+ *
+ * MTW:	Store MQ into WORD, and Clear MQ
+ * WTM:	Store WORD into MQ, and Clear WORD
+ *
+ * INC:	Increment by NUM
+ * DEC:	Decrement by NUM
+ * RNL: Rotate NUM Bits Left
+ * RNR:	Rotate NUM Bits Right
+ *
+ *
+ * Arithmetic OP:
+ *	CODE	MNEMONIC	COMMENT
+ * 	0:	NOOP		No Operation
+ * 	1:	WCS		Load WORD%POWTWO(5) into SC
+ * 	2:	SUB		Subtract
+ * 	3:	MUL		Multiply
+ * 	4:	DVI		Divide
+ * 	5:	NMI		Normalize
+ * 	6:	SHL		Shift Left
+ * 	7:	ASR		Arithmetic Right Shift
+ * 	8:	LSR		Logical Right Shift
+ * 	9:	SCA		AC |= SC
+ * 	A:	DAD		Double Precision Add
+ * 	B:	DST		Double Precision Store
+ * 	C:	DPSZ		Double Precision Skip if 0
+ * 	D:	DPIC		Double Precision Increment
+ * 	E:	DRV		Double Precision Reverse
+ * 	F:	SWM		Subtract WORD from MQ
  */
 
 /* Status Format:
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  * | 1 | 1 | 1 | 1 | 1 |     3     |               8               |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * | L |G T|INT|DIT|U M|  S T A T  |             FIELD             |
+ * | L |G T|INT|DIT|U M|  S T A T  |           F I E L D           |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  * L:	The Link
@@ -104,11 +153,11 @@
  * FIELD:	Current Code Field or Data Field depending on L is 0 or 1
  *
  * Status Code:
- * 0:	No Error
+ * 0:	Nothing
  * 1:	Encountered Interrupt
  * 2:	System Call
  * 3:	Trap
- * 4:	HLT, BUG in Usermode
+ * 4:	STP in Usermode
  * 5:	IOT, OSR in Usermode
  * 6:	Cross Field JMP, JMS Usermode
  * 7:	BUG in Kernel Mode, KERNEL PANIC
@@ -124,7 +173,7 @@
 /* Instructions:
  *
  * OP	NAME		DESCRIPTION
- * 
+ *
  * 0	AND		AND AC with the Target
  * 1	ADD		ADD the Accumulator with the Target
  * 2	ASZ		ADD the Target, and skip next instruction if result is zero
@@ -140,11 +189,11 @@
  * C	EUM		Enter Usermode at the Address
  * D	INT		Interrupt, same Format as IOT
  * E	SYS		System Call, same Format as IOT, triggers a Interrupt
- * F	BUG		Tell the system, there is a bug at the address
+ * F	STP		Halt, Halt and Catch Fire, or Report Bug
  */
 
 /* Corefile Format:
- * "012345:6789"
+ * "012345:ABCD"
  * 24 Bit : 16 Bit Hexdecimal
  * Any Invaild Input will be ignored
  */

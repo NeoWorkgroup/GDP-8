@@ -11,7 +11,7 @@
 /* 有沒有從命名看出我在向什麼公司的什麼電腦致敬？ */
 
 /* 大致架構：
- * 累加器，16 Bit 機器字，16 Bit 定址，加上 8 Bit 分段
+ * 多累加器，16 Bit 機器字，16 Bit 定址，加上 8 Bit 分段（共 24 Bit）
  * 中斷，指令權限區分，無虛擬記憶體
  */
 
@@ -21,8 +21,9 @@
 #include <unistd.h>
 #include <libgdp8.h>
 
-/* 16 Bit, Word Size */
-uint16_t ac[4]={0,0,0,0};
+/* 16 Bit, AC0 ~ AC3 and MQ */
+uint16_t ac[4]={0,0,0,0}, mq;
+uint8_t sc; /* Step Counter */
 uint16_t st=0, sf=0; /* Status and Save Field */
 uint16_t *memory;
 /* 16 Bit, Memory Addressing (and 8 bit field) */
