@@ -15,7 +15,7 @@
 #define TRUE	1
 #define FALSE	0
 
-#define AC ac
+#define AC(x) ac[x]
 #define MQ mq
 #define STATUS status
 #define MEM(x) memory[x]
@@ -52,9 +52,9 @@
 
 /* Normal Instruction Format:
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |   4   |1|1|1|      10         |
+ * |   4   |1|1| 2 |       8       |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |  O P  |I|C|M|    A D D R      |
+ * |  O P  |I|C| A |    A D D R    |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  * I:	Indirect
@@ -92,16 +92,16 @@
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  * | 1 | 1 | 1 | 1 | 1 |     3     |               8               |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * | L |G T|BIT|DIT|U M|  S T A T  |        EFFECTIVE FIELD        |
+ * | L |G T|INT|DIT|U M|  S T A T  |             FIELD             |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  * L:	The Link
  * GT:	Greater Than
- * BIT:	Bus Interrupt
+ * INT:	Bus Interrupt
  * DIT:	Disabled Interrupt
  * UM:	Usermode
  * STAT:	Status Code
- * Effective Field:	Current Code Field or Data Field depending on L is 0 or 1
+ * FIELD:	Current Code Field or Data Field depending on L is 0 or 1
  *
  * Status Code:
  * 0:	No Error

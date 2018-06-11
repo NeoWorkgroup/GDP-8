@@ -22,7 +22,7 @@
 #include <libgdp8.h>
 
 /* 16 Bit, Word Size */
-uint16_t ac=0, mq=0;
+uint16_t ac[4]={0,0,0,0};
 uint16_t st=0, sf=0; /* Status and Save Field */
 uint16_t *memory;
 /* 16 Bit, Memory Addressing (and 8 bit field) */
