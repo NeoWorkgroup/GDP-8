@@ -77,7 +77,7 @@
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  * |     O   P     |   A   | I |  G:0  |CLW|CLL|RVW|RVL|ROR|ROL|TWO| ==> Group 1
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |     O   P     |   A   | I |  G:1  |CLW|IWC|SMW|SZW|SNL|REV|OSR| ==> Group 2
+ * |     O   P     |   A   | I |  G:1  |CLW|ICW|SMW|SZW|SNL|REV|OSR| ==> Group 2
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  * |     O   P     |   A   | I |  G:2  |CLW|MTW|WTM| Arithmetic OP | ==> Group 3
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -100,7 +100,7 @@
  * ROL:	Rotate Left
  * TWO:	Rotate 2 Bits
  *
- * IWC:	Increment WORD
+ * ICW:	Increment WORD
  * OSR:	OR the content of Panel Buttons into WORD
  *
  * SMW:	Skip if WORD is negative
