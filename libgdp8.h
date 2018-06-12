@@ -3,10 +3,6 @@
  * digital computer corpration, general data processor *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* ENCODING: UTF-8
- * LANGUAGE: zh_TW, en_US
- */
-
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,13 +13,13 @@
 
 #define AC(x) ac[x]
 #define MQ mq
-#define STATUS status
+#define STATUS st
 #define MEM(x) memory[x]
 #define PC pc
-#define L status.l
+#define L ((st&0x8000)>>15)
 #define SC sc
-#define CF cf
-#define DF df
+#define CF ((field & 0xFF00) >> 8)
+#define DF (field & 0x00FF)
 
 #define SETL(x) \
 	(l=(x%2))
@@ -43,6 +39,11 @@
 #define POWTWO(exp) \
 	(1 << exp)
 
+/* Device Handler Function Pointer */
+typedef uint16_t (*DEV_HANDLER)(uint8_t, uint8_t);
+/* First uint8_t is Device Number,
+   Second uint8_t is CODE */
+
 /* Registers:
  * AC0 ~ AC3:	Accumulator
  * MQ:	Multiplier Quotient
@@ -53,9 +54,9 @@
 
 /* Normal Instruction Format:
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |       4       | 1 | 1 |   2   |               8               |
+ * |       4       |   2   | 1 | 1 |               8               |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |      O P      | I | C |   A   |            A D D R            |
+ * |      O P      |   A   | I | C |            A D D R            |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  * I:	Indirect
@@ -73,15 +74,15 @@
 
 /* OPR Instruction Format:
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |       4       |   2   | 1 |   2   | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+ * |       4       |   2   |   2   | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |     O   P     |   A   | I |  G:0  |CLW|CLL|RVW|RVL|ROR|ROL|TWO| ==> Group 1
+ * |     O   P     |   A   |  G:0  | I |CLW|CLL|RVW|RVL|ROR|ROL|TWO| ==> Group 1
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |     O   P     |   A   | I |  G:1  |CLW|ICW|SMW|SZW|SNL|REV|OSR| ==> Group 2
+ * |     O   P     |   A   |  G:1  | I |CLW|ICW|SMW|SZW|SNL|REV|OSR| ==> Group 2
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |     O   P     |   A   | I |  G:2  |CLW|MTW|WTM| Arithmetic OP | ==> Group 3
+ * |     O   P     |   A   |  G:2  | I |CLW|MTW|WTM| Arithmetic OP | ==> Group 3
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * |     O   P     |   A   | I |  G:3  |INC|DEC|RNL|RNR|   N U M   | ==> Group 4
+ * |     O   P     |   A   |  G:3  | I |INC|DEC|RNL|RNR|   N U M   | ==> Group 4
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  * I:	Indirect
@@ -141,28 +142,28 @@
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  * | 1 | 1 | 1 | 1 | 1 |     3     |               8               |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- * | L |G T|INT|DIT|U M|  S T A T  |           F I E L D           |
+ * | L |G T|INT|DIT|U M|  S T A T  |      INTERRUPTING DEVICE      |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  * L:	The Link
  * GT:	Greater Than
- * INT:	Bus Interrupt
+ * INT:	Device Interrupt
  * DIT:	Disabled Interrupt
  * UM:	Usermode
  * STAT:	Status Code
- * FIELD:	Current Code Field or Data Field depending on L is 0 or 1
+ * INTERRUPTING DEVICE:	The Device which is requesting a interrupt
  *
  * Status Code:
  * 0:	Nothing
- * 1:	Encountered Interrupt
- * 2:	System Call
- * 3:	Trap
- * 4:	STP in Usermode
- * 5:	IOT, OSR in Usermode
- * 6:	Cross Field JMP, JMS Usermode
+ * 1:	Clock Interrupt
+ * 2:	Device Interrupt
+ * 3:	System Call
+ * 4:	Trap
+ * 5:	Usermode Interrupt
+ * 6:	STP, HLT, OSR, Cross Field JMP, and JMS in Usermode
  * 7:	BUG in Kernel Mode, KERNEL PANIC
  *
- * Saved Field Format:
+ * Field Format:
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  * |               8               |               8               |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -234,9 +235,36 @@ uint16_t rotr(uint16_t word, uint8_t count)
 	return (word >> count)|(word << (16 - count));
 }
 
-void interrupt(uint32_t addr)
+/* Rotate L with WORD */
+void lwrotr(uint16_t *word)
+{
+	extern uint16_t st;
+	uint16_t temp=*word;
+	*word=((temp >> 1) | (st & 0x8000));
+	st=((st & 0x7FFF) | ((temp & 0x0001) << 15));
+	return;
+}
+
+void lwrotl(uint16_t *word)
+{
+	extern uint16_t st;
+	uint16_t temp=*word;
+	*word=((temp << 1) | (st >> 15));
+	st((st & 0x7FFF) | ((temp & 0x8000) << 15));
+	return;
+}
+
+/* Interrupt */
+void interrupt(uint32_t orig_address, unsigned int code)
 {
 	extern uint16_t *memory, pc;
-	MEM(0x00000)=addr;
+	extern uint16_t field, st, sst, sfield;
+	sst=st;
+	sfield=field;
+	st=(st & 0xF800) | (code << 8);
+	field=0x0000;
+	/* Same effect as JMS */
+	MEM(0x000000)=orig_address;
 	PC=0x1;
+	return;
 }
