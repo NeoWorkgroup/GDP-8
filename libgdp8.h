@@ -99,7 +99,7 @@ typedef uint16_t (*DEV_HANDLER)(uint8_t, uint8_t);
  *
  * ROR:	Rotate Right
  * ROL:	Rotate Left
- * TWO:	Rotate 2 Bits
+ * TWO:	Rotate 2 Bits, if(ROR==0 && ROL==0), Swap upper and lower half
  *
  * ICW:	Increment WORD
  * OSR:	OR the content of Panel Buttons into WORD
