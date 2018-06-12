@@ -173,24 +173,24 @@ typedef uint16_t (*DEV_HANDLER)(uint8_t, uint8_t);
 
 /* Instructions:
  *
- * OP	NAME		DESCRIPTION
+ * OP	NAME	USE AC?		DESCRIPTION
  *
- * 0	AND		AND AC with the Target
- * 1	ADD		ADD the Accumulator with the Target
- * 2	ASZ		ADD the Target, and skip next instruction if result is zero
- * 3	DEP		Deposit the Accumulator into the Target
- * 4	JMS		Jump to the Subroutine
- * 5	JMP		Jump to the Target
- * 6	IOT		I/O Transfer
- * 7	OPR		Operation
- * 8	PUSH		Push into Stack
- * 9	POP		Pop off Stack
- * A	CALL		Call function
- * B	RET		Return
- * C	EUM		Enter Usermode at the Address
- * D	INT		Interrupt, same Format as IOT
- * E	SYS		System Call, same Format as IOT, triggers a Interrupt
- * F	STP		Halt, Halt and Catch Fire, or Report Bug
+ * 0	AND	YES		AND AC with the Target
+ * 1	ADD	YES		ADD the Accumulator with the Target
+ * 2	ISZ	NO		ADD the Target, and skip next instruction if result is zero
+ * 3	DEP	YES		Deposit the Accumulator into the Target
+ * 4	JMS	NO		Jump to the Subroutine
+ * 5	JMP	NO		Jump to the Target
+ * 6	IOT	YES		I/O Transfer
+ * 7	OPR	YES		Operation
+ * 8	PUSH	YES		Push into Stack
+ * 9	POP	YES		Pop off Stack
+ * A	CALL	YES		Call function
+ * B	RET	YES		Return
+ * C	EUM	NO		Enter Usermode at the Address
+ * D	INT	YES		Interrupt, same Format as IOT
+ * E	SYS	YES		System Call, same Format as IOT, triggers a Interrupt
+ * F	STP	NO		Halt, Halt and Catch Fire, or Report Bug
  */
 
 /* Corefile Format:
@@ -198,6 +198,14 @@ typedef uint16_t (*DEV_HANDLER)(uint8_t, uint8_t);
  * 24 Bit : 16 Bit Hexdecimal
  * Any Invaild Input will be ignored
  */
+
+enum INSTRUCTIONS
+{
+	AND, ADD, ISZ, DEP,
+	JMS, JMP, IOT, OPR,
+	PUSH, POP, CALL, RET,
+	EUM, INT, SYS, STP
+}
 
 void load_core(FILE *fp)
 {
