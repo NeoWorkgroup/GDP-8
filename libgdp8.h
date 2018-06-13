@@ -44,6 +44,14 @@ typedef uint16_t (*DEV_HANDLER)(uint8_t, uint8_t);
 /* First uint8_t is Device Number,
    Second uint8_t is CODE */
 
+/* Device Handler Registory */
+typedef struct
+{
+	*DEV_HANDLER handler;
+	uint8_t min_dev;
+	uint8_t max_dev;
+} dev_desc_t;
+
 /* Registers:
  * AC0 ~ AC3:	Accumulator
  * MQ:	Multiplier Quotient
@@ -205,7 +213,7 @@ enum INSTRUCTIONS
 	JMS, JMP, IOT, OPR,
 	PUSH, POP, CALL, RET,
 	EUM, INT, SYS, STP
-}
+};
 
 void load_core(FILE *fp)
 {
@@ -258,7 +266,7 @@ void lwrotl(uint16_t *word)
 	extern uint16_t st;
 	uint16_t temp=*word;
 	*word=((temp << 1) | (st >> 15));
-	st((st & 0x7FFF) | ((temp & 0x8000) << 15));
+	st=((st & 0x7FFF) | ((temp & 0x8000) << 15));
 	return;
 }
 
