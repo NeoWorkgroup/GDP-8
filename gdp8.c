@@ -30,9 +30,26 @@ uint16_t *memory;
 /* 16 Bit, Memory Addressing (and 8 bit field) */
 uint16_t pc=0;
 
+/* Interrupt */
+void interrupt(uint32_t orig_address, unsigned int code)
+{
+	extern uint16_t *memory, pc;
+	extern uint16_t field, st, sst, sfield;
+	/* Save Original Content */
+	sst=st; 
+	sfield=field;
+	/* Set interrupt reason */
+	st=(st & 0xF800) | (code << 8);
+	field=0x0000;
+	/* Same effect as JMS */
+	MEM(0x000000)=orig_address;
+	PC=0x1;
+	return;
+}
+
 int main (int argc, char **argv)
 {
-	memory=calloc(POWTWO(20), 4);
+	memory=calloc(POWTWO(24), 2);
 	FILE *corefile;
 	int opt;
 	while((opt = getopt(argc, argv, "hf:s:")) != -1)

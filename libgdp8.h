@@ -21,8 +21,61 @@
 #define CF ((field & 0xFF00) >> 8)
 #define DF (field & 0x00FF)
 
+/* Define some macros to simplify things */
+#define INST_MASK(word) \
+	((word&0xf000)>>12)
+
+#define AC_MASK(word) \
+	((word&0x0C00)>>10)
+
+#define I_MASK(word) \
+	((word&0x0200)>>9)
+
+#define C_MASK(word) \
+	((word&0x0100)>>8)
+
+#define ADDR_MASK(word) \
+	(word&0x00FF)
+
+#define DEV_MASK(word) \
+	((word&0x0FF0)>>4)
+
+#define CODE_MASK(word) \
+	(word&0x000F)
+
+#define DATA_FIELD_MASK(word) \
+	(word&0x00FF)
+
+#define CODE_FIELD_MASK(word) \
+	((word&0xFF00)>>8)
+
+#define OPR_GROUP_MASK(word) \
+	((word&0x0600)>>8)
+
+#define OPR_I_MASK(word) \
+	((word&0x0100)>>7)
+
+#define ST_L_MASK(word) \
+	((word&0x8000)>>15)
+
+#define ST_GT_MASK(word) \
+	((word&0x4000)>>14)
+
+#define ST_INT_MASK(word) \
+	((word&0x2000)>>13)
+
+#define ST_DIT_MASK(word) \
+	((word&0x1000)>>12)
+
+#define ST_UM_MASK(word) \
+	((word&0x0800)>>11)
+
+#define ST_STAT_MASK(word) \
+	((word&0x0700)>>8)
+
 #define SETL(x) \
 	(l=(x%2))
+
 /* Combine Field and Address */
 #define FADDR(f, a) \
 	((f << 16) | a)
@@ -33,7 +86,7 @@
 
 /* Get Real Address */
 #define ADDR(field, pc, addr) \
-	((field << 16)|((pc&0xffff00)|addr))
+	((field << 16)|((pc&0xff00)|addr))
 
 /* Power of 2 */
 #define POWTWO(exp) \
@@ -47,7 +100,7 @@ typedef uint16_t (*DEV_HANDLER)(uint8_t, uint8_t);
 /* Device Handler Registory */
 typedef struct
 {
-	*DEV_HANDLER handler;
+	DEV_HANDLER handler;
 	uint8_t min_dev;
 	uint8_t max_dev;
 } dev_desc_t;
@@ -221,13 +274,11 @@ void load_core(FILE *fp)
 	uint16_t word=0;
 	uint32_t addr=0;
 	uint8_t field=0;
-	uint32_t readed=0;
 	while(fscanf(fp, "%x:%hx\n", &addr, &word) != EOF)
 	{
 		field=(addr&0xFF0000) >> 16;
 		addr&=0x00FFFFFF;
 		MEM(FADDR(field, addr))=word;
-		readed++;
 	}
 }
 
@@ -241,6 +292,7 @@ void dump_core(FILE *fp)
 	}
 }
 
+/* Normal Rotate */
 uint16_t rotl(uint16_t word, uint8_t count)
 {
 	return (word << count) | (word >> (16 - count));
@@ -267,20 +319,5 @@ void lwrotl(uint16_t *word)
 	uint16_t temp=*word;
 	*word=((temp << 1) | (st >> 15));
 	st=((st & 0x7FFF) | ((temp & 0x8000) << 15));
-	return;
-}
-
-/* Interrupt */
-void interrupt(uint32_t orig_address, unsigned int code)
-{
-	extern uint16_t *memory, pc;
-	extern uint16_t field, st, sst, sfield;
-	sst=st;
-	sfield=field;
-	st=(st & 0xF800) | (code << 8);
-	field=0x0000;
-	/* Same effect as JMS */
-	MEM(0x000000)=orig_address;
-	PC=0x1;
 	return;
 }

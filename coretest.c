@@ -11,9 +11,8 @@
 #include <time.h>
 int main(void)
 {
-	srandom((long int)time(NULL));
 	srandomdev();
 	uint32_t addr=0;
 	for(addr=0; addr <= 0xfffff; addr++)
-		printf("%06x:%04hx\n", addr , (uint16_t)(random()%65536));
+		printf("%06x:%04hx\n", addr , (uint16_t)(random()&0xFFFF));
 }
