@@ -31,7 +31,7 @@ uint16_t *memory;
 uint16_t pc=0;
 
 /* Interrupt */
-void interrupt(uint32_t orig_address, unsigned int code, uint8_t device_num)
+void interrupt(uint16_t orig_address, unsigned int code, uint8_t device_num)
 {
 	extern uint16_t *memory, pc;
 	extern uint16_t field, st, sst, sfield;
@@ -41,11 +41,36 @@ void interrupt(uint32_t orig_address, unsigned int code, uint8_t device_num)
 	/* Set interrupt reason */
 	st=(st & 0xF800) | (code << 8);
 	st=(st & 0x00FF) | device_num;
-	field=0x0000;
+	field|=0xFF00;
 	/* Same effect as JMS */
 	MEM(0x000000)=orig_address;
 	PC=0x1;
 	return;
+}
+
+void interpret(uint16_t word)
+{
+	switch(word)
+	{
+		case AND:
+		case ADD:
+		case ISZ:
+		case DEP:
+		case JMS:
+		case JMP:
+		case IOT:
+		case OPR:
+		case PUSH:
+		case POP:
+		case CALL:
+		case RET:
+		case EUM:
+		case INT:
+		case SYS:
+		case STP:
+		default:
+			return;
+	}
 }
 
 int main (int argc, char **argv)
