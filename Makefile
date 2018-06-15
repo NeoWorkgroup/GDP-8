@@ -1,6 +1,6 @@
 CC = clang
 CFLAGS_OPT = -Ofast -gfull -gdwarf-5 -Wall -Wextra -pipe -static -march=native -fPIE -flto -I.
-CFLAGS=-O2 -gfull -pipe -I.
+CFLAGS=-O2 -gfull -pipe -Wall -Wextra -I.
 
 all: gdp8 gdp8-static coretest
 

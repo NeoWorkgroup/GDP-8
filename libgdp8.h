@@ -85,8 +85,13 @@
 	((pc&0xffff00)|a)
 
 /* Get Real Address */
-#define ADDR(field, pc, addr) \
-	((field << 16)|((pc&0xff00)|addr))
+/* Code Field, PC, Page Address */
+#define CADDR(field, pc, addr) \
+	(((field & 0xFF00) << 8) | ((pc & 0xff00) | addr))
+
+/* Data Field, PC, Page Address */
+#define DADDR(field, pc, addr) \
+	(((field & 0x00FF) << 16) | ((pc & 0xff00) | addr))
 
 /* Power of 2 */
 #define POWTWO(exp) \
@@ -304,20 +309,18 @@ uint16_t rotr(uint16_t word, uint8_t count)
 }
 
 /* Rotate L with WORD */
-void lwrotr(uint16_t *word)
+void lwrotr(uint16_t *word, uint16_t *status)
 {
-	extern uint16_t st;
 	uint16_t temp=*word;
-	*word=((temp >> 1) | (st & 0x8000));
-	st=((st & 0x7FFF) | ((temp & 0x0001) << 15));
+	*word=((temp >> 1) | (*status & 0x8000));
+	*status=((*status & 0x7FFF) | ((temp & 0x0001) << 15));
 	return;
 }
 
-void lwrotl(uint16_t *word)
+void lwrotl(uint16_t *word, uint16_t *status)
 {
-	extern uint16_t st;
 	uint16_t temp=*word;
-	*word=((temp << 1) | (st >> 15));
-	st=((st & 0x7FFF) | ((temp & 0x8000) << 15));
+	*word=((temp << 1) | (*status >> 15));
+	*status=((*status & 0x7FFF) | ((temp & 0x8000) << 15));
 	return;
 }

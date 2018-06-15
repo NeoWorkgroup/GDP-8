@@ -31,7 +31,7 @@ uint16_t *memory;
 uint16_t pc=0;
 
 /* Interrupt */
-void interrupt(uint32_t orig_address, unsigned int code)
+void interrupt(uint32_t orig_address, unsigned int code, uint8_t device_num)
 {
 	extern uint16_t *memory, pc;
 	extern uint16_t field, st, sst, sfield;
@@ -40,6 +40,7 @@ void interrupt(uint32_t orig_address, unsigned int code)
 	sfield=field;
 	/* Set interrupt reason */
 	st=(st & 0xF800) | (code << 8);
+	st=(st & 0x00FF) | device_num;
 	field=0x0000;
 	/* Same effect as JMS */
 	MEM(0x000000)=orig_address;
