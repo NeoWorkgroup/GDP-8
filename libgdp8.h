@@ -111,11 +111,15 @@ typedef struct
 } dev_desc_t;
 
 /* Registers:
- * AC0 ~ AC3:	Accumulator
- * MQ:	Multiplier Quotient
- * PC:	Program Counter
- * L:	The Link
- * STATUS: Status
+ * 	AC0~AC3:	Accumulator
+ * 	MQ:		Multiplier Quotient
+ * 	PC:		Program Counter
+ * 	L:		The Link
+ * 	STATUS:		Status
+ *
+ * Special Address:
+ * 	0xFF0000:		Interrupt Handler
+ * 	0x000020~0x00002F:	Auto Increment (If Indirect)
  */
 
 /* Normal Instruction Format:
@@ -128,6 +132,18 @@ typedef struct
  * I:	Indirect
  * C:	Current Page
  * A:	Which Accumulator
+ */
+
+/* No AC Instruction Format:
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |       4       |   2   | 1 | 1 |               8               |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * |      O P      |   F   | I | C |            A D D R            |
+ * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *
+ * I:	Indirect
+ * C:	Current Page
+ * F:	Instruction specific Flag
  */
 
 /* IOT Instruction Format:
