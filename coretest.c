@@ -13,6 +13,6 @@ int main(void)
 {
 	srandomdev();
 	uint32_t addr=0;
-	for(addr=0; addr <= 0xfffff; addr++)
+	for(addr=0; addr <= 0xffffff; addr++)
 		printf("%06x:%04hx\n", addr , (uint16_t)(random()&0xFFFF));
 }
