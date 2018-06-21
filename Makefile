@@ -1,14 +1,24 @@
 CC = clang
-CFLAGS_OPT = -Ofast -gfull -gdwarf-5 -Wall -Wextra -pipe -static -march=native -fPIE -flto -I.
-CFLAGS=-O2 -gfull -pipe -Wall -Wextra -I.
+CFLAGS=-O2 -g -pipe -Wall -Wextra -I.
 
-all: gdp8 gdp8-static coretest
+# Use this if you are interested in debugging Compilers
+#CFLAGS = -Ofast -gfull -gdwarf-5 -Wall -Wextra -pipe -static -march=native -fPIE -flto -I.
 
-gdp8:
-	$(CC) $(CFLAGS) $(LDFLAGS) gdp8.c -o gdp8
-gdp8-static:
-	$(CC) $(CFLAGS_OPT) $(LDFLAGS) gdp8.c -o gdp8.static
+all: gdp8
+syntax:
+	$(CC) $(CFLAGS) -fsyntax-only *.c
+gdp8:	gdp8.o io.o inst.c
+	$(CC) $(LDFLAGS) -o gdp8 \
+		gdp8.o io.o inst.o
+gdp8.o:
+	$(CC) $(CFLAGS) -c ${.PREFIX}.c
+io.o:
+	$(CC) $(CFLAGS) -c ${.PREFIX}.c
+inst.o:
+	$(CC) $(CFLAGS) -c ${.PREFIX}.c
+
 coretest:
 	$(CC) $(CFLAGS) $(LDFLAGS) coretest.c -o coretest
+
 clean:
-	rm -fv gdp8 coretest
+	-rm -fv gdp8 coretest *.o

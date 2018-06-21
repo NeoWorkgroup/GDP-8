@@ -22,19 +22,54 @@
 #include <libgdp8.h>
 
 /* 16 Bit, AC0 ~ AC3 and MQ */
-uint16_t ac[4]={0,0,0,0}, mq;
+word_t ac[4]={0,0,0,0}, mq;
 uint8_t sc; /* Step Counter */
-uint16_t st=0, field=0; /* Status and Field */
-uint16_t sst=0, sfield=0; /* Saved Status and Field */
-uint16_t *memory;
+word_t st=0, field=0; /* Status and Field */
+word_t sst=0, sfield=0; /* Saved Status and Field */
+word_t *memory;
 /* 16 Bit, Memory Addressing (and 8 bit field) */
-uint16_t pc=0;
+word_t pc=0;
+
+dev_desc_t dev_table[256]=
+{
+	{"CON", console_handler, 0, 0}
+};
+
+/* Corefile Format:
+ * "012345:ABCD"
+ * 24 Bit : 16 Bit Hexdecimal
+ * Any Invaild Input will be ignored
+ */
+
+void load_core(FILE *fp)
+{
+	extern uint16_t *memory;
+	uint16_t word=0;
+	uint32_t addr=0;
+	uint8_t field=0;
+	while(fscanf(fp, "%x:%hx\n", &addr, &word) != EOF)
+	{
+		field=(addr&0xFF0000) >> 16;
+		addr&=0x00FFFFFF;
+		MEM(FADDR(field, addr))=word;
+	}
+}
+
+void dump_core(FILE *fp)
+{
+	uint16_t word=0;
+	uint32_t addr=0;
+	for(addr=0; addr <= 0xFFFFFF; addr++)
+	{
+		fprintf(fp, "%06x:%04hx\n", addr, word);
+	}
+}
 
 /* Interrupt */
-void interrupt(uint16_t orig_address, unsigned int code, uint8_t device_num)
+void interrupt(word_t orig_address, unsigned int code, uint8_t device_num)
 {
-	extern uint16_t *memory, pc;
-	extern uint16_t field, st, sst, sfield;
+	extern word_t *memory, pc;
+	extern word_t field, st, sst, sfield;
 	/* Save Original Content */
 	sst=st; 
 	sfield=field;
@@ -48,26 +83,66 @@ void interrupt(uint16_t orig_address, unsigned int code, uint8_t device_num)
 	return;
 }
 
-void interpret(uint16_t word)
+void interpret(word_t word)
 {
-	switch(word)
+	switch(INST_MASK(word))
 	{
 		case AND:
+			inst_and(word);
+			PC++;
+			return;
 		case ADD:
+			inst_add(word);
+			PC++;
+			return;
 		case ISZ:
+			inst_isz(word);
+			PC++;
+			return;
 		case DEP:
+			inst_dep(word);
+			PC++;
+			return;
 		case JMS:
+			inst_jms(word);
+			return;
 		case JMP:
+			inst_jmp(word);
+			return;
 		case IOT:
+			inst_iot(word);
+			PC++;
+			return;
 		case OPR:
-		case PUSH:
+			inst_opr(word);
+			PC++;
+			return;
+		case PSH:
+			inst_psh(word);
+			PC++;
+			return;
 		case POP:
-		case CALL:
+			inst_pop(word);
+			PC++;
+			return;
+		case CAL:
+			inst_cal(word);
+			return;
 		case RET:
+			inst_ret(word);
+			return;
 		case EUM:
+			inst_eum(word);
+			return;
 		case INT:
+			inst_int(word);
+			return;
 		case SYS:
+			inst_sys(word);
+			return;
 		case STP:
+			inst_stp(word);
+			return;
 		default:
 			return;
 	}
@@ -78,17 +153,19 @@ int main (int argc, char **argv)
 	memory=calloc(POWTWO(24), 2);
 	FILE *corefile;
 	int opt;
+
+	/* Parse Arguments */
 	while((opt = getopt(argc, argv, "hf:s:")) != -1)
 	{
 		switch(opt)
 		{
 			case 's':
-				sscanf(optarg, "%hx", &pc);
+				sscanf(optarg, "%hx", &PC);
 				break;
 			case 'f':
 				if((corefile = fopen(optarg, "r")) == NULL)
 				{
-					perror(argv[0]);
+					perror(optarg);
 					exit(8);
 				}
 				load_core(corefile);
@@ -100,6 +177,11 @@ int main (int argc, char **argv)
 				fprintf(stderr,"%s: %s\n", argv[0], optarg);
 				exit(0);
 		}
+	}
+
+	while(1)
+	{
+
 	}
 	return 0;
 }

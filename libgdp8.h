@@ -16,99 +16,105 @@
 #define STATUS st
 #define MEM(x) memory[x]
 #define PC pc
-#define L ((st&0x8000)>>15)
+#define L ((st & 0x8000) >> 15)
 #define SC sc
 #define CF ((field & 0xFF00) >> 8)
 #define DF (field & 0x00FF)
 
 /* Define some macros to simplify things */
 #define INST_MASK(word) \
-	((word&0xf000)>>12)
+	((word & 0xf000) >> 12)
 
 #define AC_MASK(word) \
-	((word&0x0C00)>>10)
+	((word & 0x0C00) >> 10)
+
+#define F_MASK(word) \
+	((word & 0x0C00) >> 10)
 
 #define I_MASK(word) \
-	((word&0x0200)>>9)
+	((word & 0x0200) >> 9)
 
 #define C_MASK(word) \
-	((word&0x0100)>>8)
+	((word & 0x0100) >> 8)
 
 #define ADDR_MASK(word) \
-	(word&0x00FF)
+	(word & 0x00FF)
 
 #define DEV_MASK(word) \
-	((word&0x0FF0)>>4)
+	((word & 0x0FF0) >> 4)
 
 #define CODE_MASK(word) \
-	(word&0x000F)
+	(word & 0x000F)
 
 #define DATA_FIELD_MASK(word) \
-	(word&0x00FF)
+	(word & 0x00FF)
 
 #define CODE_FIELD_MASK(word) \
-	((word&0xFF00)>>8)
+	((word & 0xFF00) >> 8)
 
 #define OPR_GROUP_MASK(word) \
-	((word&0x0600)>>8)
+	((word & 0x0600) >> 8)
 
 #define OPR_I_MASK(word) \
-	((word&0x0100)>>7)
+	((word & 0x0100) >> 7)
 
 #define ST_L_MASK(word) \
-	((word&0x8000)>>15)
+	((word & 0x8000) >> 15)
 
 #define ST_GT_MASK(word) \
-	((word&0x4000)>>14)
+	((word & 0x4000) >> 14)
 
 #define ST_INT_MASK(word) \
-	((word&0x2000)>>13)
+	((word & 0x2000) >> 13)
 
 #define ST_DIT_MASK(word) \
-	((word&0x1000)>>12)
+	((word & 0x1000) >> 12)
 
 #define ST_UM_MASK(word) \
-	((word&0x0800)>>11)
+	((word & 0x0800) >> 11)
 
 #define ST_STAT_MASK(word) \
-	((word&0x0700)>>8)
+	((word & 0x0700) >> 8)
 
 #define SETL(x) \
-	(l=(x%2))
+	(l = (x & 0x1))
 
 /* Combine Field and Address */
 #define FADDR(f, a) \
 	((f << 16) | a)
 
 /* Get Page Address's Real Address */
-#define PADDR(pc, a) \
-	((pc&0xffff00)|a)
+#define PADDR(p, a) \
+	((p & 0xffff00) | a)
 
 /* Get Real Address */
-/* Code Field, PC, Page Address */
-#define CADDR(field, pc, addr) \
-	(((field & 0xFF00) << 8) | ((pc & 0xff00) | addr))
+/* Code Field, Address */
+#define CADDR(f, p, a) \
+	(((field & 0xFF00) << 8) | ((p & 0xff00) | addr))
 
-/* Data Field, PC, Page Address */
-#define DADDR(field, pc, addr) \
-	(((field & 0x00FF) << 16) | ((pc & 0xff00) | addr))
+/* Data Field, Page Address */
+#define DADDR(f, p, a) \
+	(((f & 0x00FF) << 16) | ((p & 0xff00) | a))
+
+/* Common Combined Usage */
+/* Indirect Address (Indirect from CODE FIELD to DATA FIEL) */
+#define IMEM(f, p, word) \
+	memory[(((field & 0x00FF) << 16) | memory[(((field & 0xFF00) << 8) | ((p & 0xFF00) | (word & 0x00FF)))])]
+/* Direct Access from CODE FIELD */
+#define DMEM(f, p, word) \
+	memory[(((field & 0xFF00) << 8) | ((p & 0xff00) | (word & 0x00FF)))]
 
 /* Power of 2 */
 #define POWTWO(exp) \
 	(1 << exp)
 
-/* Device Handler Function Pointer */
-typedef uint16_t (*DEV_HANDLER)(uint8_t, uint8_t);
-/* First uint8_t is Device Number,
-   Second uint8_t is CODE */
+typedef uint16_t word_t;
 
-/* Device Handler Registory */
-typedef struct
-{
-	DEV_HANDLER handler;
-	uint8_t min_dev;
-	uint8_t max_dev;
-} dev_desc_t;
+/* Notation:
+ * 	0x(XX)YYYY: XX -> Field, YYYY -> Address
+ * 	<L,WORD>:	= (L << 16) | WORD
+ * 	<AC,MQ>:	= (AC(x) << 16) | MQ
+ */
 
 /* Registers:
  * 	AC0~AC3:	Accumulator
@@ -118,8 +124,8 @@ typedef struct
  * 	STATUS:		Status
  *
  * Special Address:
- * 	0xFF0000:		Interrupt Handler
- * 	0x000020~0x00002F:	Auto Increment (If Indirect)
+ * 	0x(FF)0000:		Interrupt Handler
+ * 	0x0020~0x002F:	Auto Increment (If Indirect)
  */
 
 /* Normal Instruction Format:
@@ -152,6 +158,9 @@ typedef struct
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  * |      O P      |          D E V I C E          |    C O D E    |
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *
+ * DEVICE:	The target Device
+ * CODE:	The Pulse Code to Send
  */
 
 /* OPR Instruction Format:
@@ -202,7 +211,7 @@ typedef struct
  *
  * Arithmetic OP:
  *	CODE	MNEMONIC	COMMENT
- * 	0:	NOOP		No Operation
+ * 	0:	NOP		No Operation
  * 	1:	WCS		Load WORD%POWTWO(5) into SC
  * 	2:	SUB		Subtract
  * 	3:	MUL		Multiply
@@ -214,8 +223,8 @@ typedef struct
  * 	9:	SCA		AC |= SC
  * 	A:	DAD		Double Precision Add
  * 	B:	DST		Double Precision Store
- * 	C:	DPSZ		Double Precision Skip if 0
- * 	D:	DPIC		Double Precision Increment
+ * 	C:	DSZ		Double Precision Skip if 0
+ * 	D:	DPI		Double Precision Increment
  * 	E:	DRV		Double Precision Reverse
  * 	F:	SWM		Subtract WORD from MQ
  */
@@ -240,8 +249,8 @@ typedef struct
  * 1:	Clock Interrupt
  * 2:	Device Interrupt
  * 3:	System Call
- * 4:	Trap
- * 5:	Usermode Interrupt
+ * 4:	Usermode Interrupt
+ * 5:	Trap
  * 6:	STP, HLT, OSR, Cross Field JMP, and JMS in Usermode
  * 7:	BUG in Kernel Mode, KERNEL PANIC
  *
@@ -256,7 +265,6 @@ typedef struct
 /* Instructions:
  *
  * OP	NAME	USE AC?		DESCRIPTION
- *
  * 0	AND	YES		AND AC with the Target
  * 1	ADD	YES		ADD the Accumulator with the Target
  * 2	ISZ	NO		ADD the Target, and skip next instruction if result is zero
@@ -264,10 +272,10 @@ typedef struct
  * 4	JMS	NO		Jump to the Subroutine
  * 5	JMP	NO		Jump to the Target
  * 6	IOT	YES		I/O Transfer
- * 7	OPR	YES		Operation
- * 8	PUSH	YES		Push into Stack
+ * 7	OPR	YES		Operations
+ * 8	PSH	YES		Push into Stack
  * 9	POP	YES		Pop off Stack
- * A	CALL	YES		Call function
+ * A	CAL	YES		Call function
  * B	RET	YES		Return
  * C	EUM	NO		Enter Usermode at the Address
  * D	INT	YES		Interrupt, same Format as IOT
@@ -275,68 +283,55 @@ typedef struct
  * F	STP	NO		Halt, Halt and Catch Fire, or Report Bug
  */
 
-/* Corefile Format:
- * "012345:ABCD"
- * 24 Bit : 16 Bit Hexdecimal
- * Any Invaild Input will be ignored
- */
+typedef void (*DEV_HANDLER)(uint8_t, uint8_t);
 
-enum INSTRUCTIONS
+/* Device Handler Registory */
+typedef struct
 {
-	AND, ADD, ISZ, DEP,
-	JMS, JMP, IOT, OPR,
-	PUSH, POP, CALL, RET,
-	EUM, INT, SYS, STP
-};
+	char *name;	/* To Store Device Name */
+	DEV_HANDLER handler;	/* Device Handler Function */
+	uint8_t min_dev;	/* Minimal Device Number Managed By This Handler */
+	uint8_t max_dev;	/* Maxium Device Number Managed By This Handler */
+} dev_desc_t;
 
-void load_core(FILE *fp)
-{
-	extern uint16_t *memory;
-	uint16_t word=0;
-	uint32_t addr=0;
-	uint8_t field=0;
-	while(fscanf(fp, "%x:%hx\n", &addr, &word) != EOF)
-	{
-		field=(addr&0xFF0000) >> 16;
-		addr&=0x00FFFFFF;
-		MEM(FADDR(field, addr))=word;
-	}
-}
+/* Instruction Definitions */
+#define AND	0x0
+#define ADD	0x1
+#define ISZ	0x2
+#define DEP	0x3
+#define JMS	0x4
+#define JMP	0x5
+#define IOT	0x6
+#define OPR	0x7
+#define PSH	0x8
+#define POP	0x9
+#define CAL	0xA
+#define RET	0xB
+#define EUM	0xC
+#define INT	0xD
+#define SYS	0xE
+#define STP	0xF
 
-void dump_core(FILE *fp)
-{
-	uint16_t word=0;
-	uint32_t addr=0;
-	for(addr=0; addr <= 0xFFFFFF; addr++)
-	{
-		fprintf(fp, "%06x:%04hx\n", addr, word);
-	}
-}
+void inst_and(uint16_t word);
+void inst_add(uint16_t word);
+void inst_isz(uint16_t word);
+void inst_dep(uint16_t word);
+void inst_jms(uint16_t word);
+void inst_jmp(uint16_t word);
+void inst_iot(uint16_t word);
+void inst_opr(uint16_t word);
+void inst_psh(uint16_t word);
+void inst_pop(uint16_t word);
+void inst_cal(uint16_t word);
+void inst_ret(uint16_t word);
+void inst_eum(uint16_t word);
+void inst_int(uint16_t word);
+void inst_sys(uint16_t word);
+void inst_stp(uint16_t word);
+uint16_t rotl(uint16_t word, uint8_t count);
+uint16_t rotr(uint16_t word, uint8_t count);
+void lwrotr(uint16_t *word, uint16_t *status);
+void lwrotl(uint16_t *word, uint16_t *status);
 
-/* Normal Rotate */
-uint16_t rotl(uint16_t word, uint8_t count)
-{
-	return (word << count) | (word >> (16 - count));
-}
-
-uint16_t rotr(uint16_t word, uint8_t count)
-{
-	return (word >> count)|(word << (16 - count));
-}
-
-/* Rotate L with WORD */
-void lwrotr(uint16_t *word, uint16_t *status)
-{
-	uint16_t temp=*word;
-	*word=((temp >> 1) | (*status & 0x8000));
-	*status=((*status & 0x7FFF) | ((temp & 0x0001) << 15));
-	return;
-}
-
-void lwrotl(uint16_t *word, uint16_t *status)
-{
-	uint16_t temp=*word;
-	*word=((temp << 1) | (*status >> 15));
-	*status=((*status & 0x7FFF) | ((temp & 0x8000) << 15));
-	return;
-}
+/* Device Handlers */
+void console_handler(uint8_t device, uint8_t code);
