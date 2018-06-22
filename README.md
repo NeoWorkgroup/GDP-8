@@ -1,5 +1,7 @@
 # Neo_Chen's 16 Bit Virtual Machine (WIP)
 
+![DCC GDP-8 Logo](https://gitlab.com/NeoWorkgroup/GDP-8/raw/master/Logo/DCC_GDP-8_Logo.png "Yes, this is our logo")
+
 ## 簡短介紹：
 
 DCC GDP-8 是一個模仿 DEC PDP-8 的虛擬機，使用 16 位元機器字，
