@@ -43,17 +43,24 @@ int read_core(word_t *memory, FILE *fp)
 	int count=0;
 	if(flag & 0x0001) /* Is RIM */
 	{
-		while((unsure_addr = getaddrint(fp)) != EOF )
+		while((addr = getaddrint(fp)) != EOF )
 		{
-			MEM(unsure_addr) = getdataint(fp);
+			data = getdataint(fp);
+			if(data == EOF)
+				return EOF;
 			count++;
 		}
-		return;
+		return count;
 	}
 	else /* Is BIN */
 	{
 		addr = getaddrint(fp); /* Initial Address */
 		while((unsure_data = getdataint(fp)) != EOF)
+		{
 			MEM(addr++) = (word_t)data;
+			count++;
+		}
+		return count;
 	}
+	return EOF; /* You shouldn't be here */
 }
