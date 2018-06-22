@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <time.h>
+
 int main(void)
 {
 	srandomdev();

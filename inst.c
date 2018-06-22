@@ -44,18 +44,18 @@ void lwrotl(uint16_t *word, uint16_t *status)
 void inst_and(word_t word)
 {
 	if(I_MASK(word))
-		AC(AC_MASK(word)) &= MEM(DADDR(field, MEM(CADDR(field, PADDR(PC, ADDR_MASK(word))))));
+		AC(AC_MASK(word)) &= MEM(DADDR(FIELD, MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word))))));
 	else
-		AC(AC_MASK(word)) &= MEM(CADDR(field, PADDR(PC, ADDR_MASK(word))));
+		AC(AC_MASK(word)) &= MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word))));
 }
 
 /* 0x1:ADD */
 void inst_add(word_t word)
 {
 	if(I_MASK(word))
-		AC(AC_MASK(word)) += MEM(DADDR(field, MEM(CADDR(field, PADDR(PC, ADDR_MASK(word))))));
+		AC(AC_MASK(word)) += MEM(DADDR(FIELD, MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word))))));
 	else
-		AC(AC_MASK(word)) += MEM(CADDR(field, PADDR(PC, ADDR_MASK(word))));
+		AC(AC_MASK(word)) += MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word))));
 }
 
 /* 0x2:ISZ */
@@ -63,12 +63,12 @@ void inst_isz(word_t word)
 {
 	if(I_MASK(word))
 	{
-		if(++MEM(CADDR(field, PADDR(PC, ADDR_MASK(word)))) == 0)
+		if(++MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word)))) == 0)
 			PC++;
 	}
 	else
 	{
-		if(++MEM(CADDR(field, PADDR(PC, ADDR_MASK(word)))) == 0)
+		if(++MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word)))) == 0)
 			PC++;
 	}
 }
@@ -77,9 +77,9 @@ void inst_isz(word_t word)
 void inst_dep(word_t word)
 {
 	if(I_MASK(word))
-		MEM(DADDR(field, MEM(CADDR(field, PADDR(PC, ADDR_MASK(word)))))) = AC(AC_MASK(word));
+		MEM(DADDR(FIELD, MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word)))))) = AC(AC_MASK(word));
 	else
-		MEM(CADDR(field, PADDR(PC, ADDR_MASK(word)))) = AC(AC_MASK(word));
+		MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word)))) = AC(AC_MASK(word));
 	AC(AC_MASK(word)) = 0x0000;
 }
 
@@ -88,14 +88,14 @@ void inst_jms(word_t word)
 {
 	if(I_MASK(word))
 	{
-		/* Cross Field JMS */
-		MEM(DADDR(field, MEM(CADDR(field, PADDR(PC, ADDR_MASK(word)))))) = PC;
-		PC = MEM(CADDR(field, PADDR(PC, ADDR_MASK(word)))) + 1;
-		field = ((field & 0x00FF) << 16) | (field & 0xFF); /* DATA FIELD to CODE FIELD */
+		/* Cross FIELD JMS */
+		MEM(DADDR(FIELD, MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word)))))) = PC;
+		PC = MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word)))) + 1;
+		FIELD = ((FIELD & 0x00FF) << 16) | (FIELD & 0xFF); /* DATA FIELD to CODE FIELD */
 	}
 	else
 	{
-		MEM(CADDR(field, PADDR(PC, ADDR_MASK(word)))) = PC;
+		MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word)))) = PC;
 		PC = PADDR(PC, ADDR_MASK(word)) + 1;
 	}
 }
@@ -105,9 +105,9 @@ void inst_jmp(word_t word)
 {
 	if(I_MASK(word))
 	{
-		/* Cross Field JMP */
-		PC = MEM(CADDR(field, PADDR(PC, ADDR_MASK(word))));
-		field = ((field & 0x00FF) << 16) | (field & 0xFF); /* DATA FIELD to CODE FIELD */
+		/* Cross FIELD JMP */
+		PC = MEM(CADDR(FIELD, PADDR(PC, ADDR_MASK(word))));
+		FIELD = ((FIELD & 0x00FF) << 16) | (FIELD & 0xFF); /* DATA FIELD to CODE FIELD */
 	}
 	else
 	{
@@ -131,9 +131,9 @@ void inst_opr(word_t word)
 void inst_psh(word_t word)
 {
 	if(I_MASK(word))
-		MEM(CADDR(field, AC(AC_MASK(word)))) = MEM(DADDR(field, MEM(CADDR(field, ADDR_MASK(word)))));
+		MEM(CADDR(FIELD, AC(AC_MASK(word)))) = MEM(DADDR(FIELD, MEM(CADDR(FIELD, ADDR_MASK(word)))));
 	else
-		MEM(CADDR(field, AC(AC_MASK(word)))) = MEM(CADDR(field, ADDR_MASK(word)));
+		MEM(CADDR(FIELD, AC(AC_MASK(word)))) = MEM(CADDR(FIELD, ADDR_MASK(word)));
 	AC(AC_MASK(word))--;
 }
 
@@ -142,24 +142,24 @@ void inst_pop(word_t word)
 {
 	AC(AC_MASK(word))++;
 	if(I_MASK(word))
-		IMEM(field, PC, word) = MEM(CADDR(field, AC(AC_MASK(word))));
+		IMEM(FIELD, PC, word) = MEM(CADDR(FIELD, AC(AC_MASK(word))));
 	else
-		DMEM(field, PC, word) = MEM(CADDR(field, AC(AC_MASK(word))));
-	MEM(CADDR(field, AC(AC_MASK(word)))) = 0x0000;
+		DMEM(FIELD, PC, word) = MEM(CADDR(FIELD, AC(AC_MASK(word))));
+	MEM(CADDR(FIELD, AC(AC_MASK(word)))) = 0x0000;
 }
 
 /* 0xA:CAL */
 void inst_cal(word_t word)
 {
-	MEM(CADDR(field, AC(AC_MASK(word))--)) = PC;
-	MEM(CADDR(field, AC(AC_MASK(word))--)) = field;
+	MEM(CADDR(FIELD, AC(AC_MASK(word))--)) = PC;
+	MEM(CADDR(FIELD, AC(AC_MASK(word))--)) = FIELD;
 	if(I_MASK(word))
 	{
-		PC = IMEM(field, PC, word);
-		field = ((field & 0x00FF) << 16) | (field & 0xFF);
+		PC = IMEM(FIELD, PC, word);
+		FIELD = ((FIELD & 0x00FF) << 16) | (FIELD & 0xFF);
 	}
 	else
-		PC = DMEM(field, PC, word);
+		PC = DMEM(FIELD, PC, word);
 }
 
 /* 0xB:RET */
@@ -168,15 +168,15 @@ void inst_ret(word_t word)
 {
 	if(I_MASK(word))
 	{
-		PC = MEM(DADDR(field, MEM(CADDR(field, ++AC(AC_MASK(word))))));
-		MEM(DADDR(field, MEM(CADDR(field, AC(AC_MASK(word)))))) = 0x0000;
-		field = MEM(DADDR(field, MEM(CADDR(field, ++AC(AC_MASK(word))))));
-		MEM(DADDR(field, MEM(CADDR(field, AC(AC_MASK(word)))))) = 0x0000;
+		PC = MEM(DADDR(FIELD, MEM(CADDR(FIELD, ++AC(AC_MASK(word))))));
+		MEM(DADDR(FIELD, MEM(CADDR(FIELD, AC(AC_MASK(word)))))) = 0x0000;
+		FIELD = MEM(DADDR(FIELD, MEM(CADDR(FIELD, ++AC(AC_MASK(word))))));
+		MEM(DADDR(FIELD, MEM(CADDR(FIELD, AC(AC_MASK(word)))))) = 0x0000;
 	}
 	else
 	{
-		PC = MEM(CADDR(field, ++AC(AC_MASK(word))));
-		MEM(CADDR(field, AC(AC_MASK(word)))) = 0x0000;
+		PC = MEM(CADDR(FIELD, ++AC(AC_MASK(word))));
+		MEM(CADDR(FIELD, AC(AC_MASK(word)))) = 0x0000;
 	}
 }
 
@@ -185,12 +185,22 @@ void inst_eum(word_t word)
 {
 	/* Set the UM flag in status */
 	status |= 0x0800;
-
+	if(I_MASK(word))
+	{
+		PC = IADDR(FIELD, PC, word);
+		FIELD = (FIELD & 0x00FF) | ((FIELD & 0x00FF) << 8);
+	}
+	else
+		PC = DADDR(FIELD, PC, word);
+	STATUS |= 0x1000; /* Disable Interrupt */
 }
 
 /* 0xD:INT */
 void inst_int(word_t word)
 {
+	/* 0x04: User Interrupt */
+	/* 0x00: CPU Device Handler */
+	Interrupt(PC, 0x04, 0x00)
 }
 
 /* 0xE:SYS */

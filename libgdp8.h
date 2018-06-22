@@ -16,6 +16,7 @@
 #define STATUS st
 #define MEM(x) memory[x]
 #define PC pc
+#define FIELD field
 #define L ((st & 0x8000) >> 15)
 #define SC sc
 #define CF ((field & 0xFF00) >> 8)
@@ -85,24 +86,33 @@
 
 /* Get Page Address's Real Address */
 #define PADDR(p, a) \
-	((p & 0xffff00) | a)
+	((p & 0xFF00) | a)
 
 /* Get Real Address */
 /* Code Field, Address */
-#define CADDR(f, p, a) \
+#define CADDRESS(f, p, a) \
 	(((field & 0xFF00) << 8) | ((p & 0xff00) | addr))
 
 /* Data Field, Page Address */
-#define DADDR(f, p, a) \
+#define DADDRESS(f, p, a) \
 	(((f & 0x00FF) << 16) | ((p & 0xff00) | a))
 
 /* Common Combined Usage */
 /* Indirect Address (Indirect from CODE FIELD to DATA FIEL) */
 #define IMEM(f, p, word) \
-	memory[(((field & 0x00FF) << 16) | memory[(((field & 0xFF00) << 8) | ((p & 0xFF00) | (word & 0x00FF)))])]
+	(memory[(((field & 0x00FF) << 16) | memory[(((field & 0xFF00) << 8) | ((p & 0xFF00) | (word & 0x00FF)))])])
+
+/* Address only */
+#define IADDR(field, p, word) \
+	(memory[(((field & 0xFF00) << 8) | ((p & 0xFF00) | (word & 0x00FF)))])
+
 /* Direct Access from CODE FIELD */
 #define DMEM(f, p, word) \
-	memory[(((field & 0xFF00) << 8) | ((p & 0xff00) | (word & 0x00FF)))]
+	(memory[(((field & 0xFF00) << 8) | ((p & 0xff00) | (word & 0x00FF)))])
+
+// /* Address Only */
+#define DADDR(field, p, word) \
+	(((p & 0xff00) | (word & 0x00FF)))
 
 /* Power of 2 */
 #define POWTWO(exp) \
@@ -238,7 +248,7 @@ typedef uint16_t word_t;
  *
  * L:	The Link
  * GT:	Greater Than
- * INT:	Device Interrupt
+ * INT:	Interrupt
  * DIT:	Disabled Interrupt
  * UM:	Usermode
  * STAT:	Status Code

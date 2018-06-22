@@ -32,7 +32,16 @@ word_t pc=0;
 
 dev_desc_t dev_table[256]=
 {
-	{"CON", console_handler, 0, 0}
+	{"CPU", cpu_handler, 0x00, 0x00},
+	{"CON", console_handler, 0x01, 0x01},
+	/*
+	{"CLK", clock_handler, 0x02, 0x02},
+	{"MUX", terminal_handler, 0x10, 0x1F},
+	{"DSK", disk_handler, 0x20, 0x2F},
+	{"TAP", tape_handler, 0x30, 0x3F},
+	{"NET", network_handler, 0x40, 4F},
+	{"MON", monitor_handler, 0x50, 0x5F}
+	*/
 };
 
 /* Corefile Format:
@@ -49,19 +58,17 @@ void load_core(FILE *fp)
 	uint8_t field=0;
 	while(fscanf(fp, "%x:%hx\n", &addr, &word) != EOF)
 	{
-		field=(addr&0xFF0000) >> 16;
-		addr&=0x00FFFFFF;
-		MEM(FADDR(field, addr))=word;
+		MEM(addr) = word;
 	}
 }
 
 void dump_core(FILE *fp)
 {
-	uint16_t word=0;
+	extern uint16_t *memory;
 	uint32_t addr=0;
 	for(addr=0; addr <= 0xFFFFFF; addr++)
 	{
-		fprintf(fp, "%06x:%04hx\n", addr, word);
+		fprintf(fp, "%06x:%04hx\n", addr, memory[addr]);
 	}
 }
 
@@ -150,9 +157,14 @@ void interpret(word_t word)
 
 int main (int argc, char **argv)
 {
+	/* Init */
 	memory=calloc(POWTWO(24), 2);
 	FILE *corefile;
 	int opt;
+	
+	/* Reset */
+	PC = 0x0000;
+	FIELD = 0x0000;
 
 	/* Parse Arguments */
 	while((opt = getopt(argc, argv, "hf:s:")) != -1)
@@ -179,7 +191,7 @@ int main (int argc, char **argv)
 		}
 	}
 
-	while(1)
+	while(ST_STAT_MASK(word) != 0x7)
 	{
 
 	}
