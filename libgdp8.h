@@ -3,9 +3,12 @@
  * digital computer corpration, general data processor *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/* libgdp8.h: Common types and macros */
+
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #define TRUE	1
@@ -232,11 +235,11 @@ typedef uint16_t word_t;
  * 	8:	LSR		Logical Right Shift
  * 	9:	SCA		AC |= SC
  * 	A:	DAD		Double Precision Add
+ * 	F:	DSU		Double Precision Subtract
  * 	B:	DST		Double Precision Store
  * 	C:	DSZ		Double Precision Skip if 0
  * 	D:	DPI		Double Precision Increment
  * 	E:	DRV		Double Precision Reverse
- * 	F:	SWM		Subtract WORD from MQ
  */
 
 /* Status Format:

@@ -3,9 +3,12 @@
  * digital computer corpration, general data processor *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/* io.c: IOT Device Handler */
+
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 #include <libgdp8.h>
 

@@ -3,6 +3,8 @@
  * digital computer corpration, general data processor *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/* gdp8.c: Main source file */
+
 /* Neo_Chen: This will be the most useless Virtual Machine ever!
  * ENCODING: UTF-8
  * LANGUAGE: zh_TW, en_US
@@ -19,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 #include <libgdp8.h>
 
 /* 16 Bit, AC0 ~ AC3 and MQ */
@@ -43,34 +46,6 @@ dev_desc_t dev_table[256]=
 	{"MON", monitor_handler, 0x50, 0x5F}
 	*/
 };
-
-/* Corefile Format:
- * "012345:ABCD"
- * 24 Bit : 16 Bit Hexdecimal
- * Any Invaild Input will be ignored
- */
-
-void load_core(FILE *fp)
-{
-	extern uint16_t *memory;
-	uint16_t word=0;
-	uint32_t addr=0;
-	uint8_t field=0;
-	while(fscanf(fp, "%x:%hx\n", &addr, &word) != EOF)
-	{
-		MEM(addr) = word;
-	}
-}
-
-void dump_core(FILE *fp)
-{
-	extern uint16_t *memory;
-	uint32_t addr=0;
-	for(addr=0; addr <= 0xFFFFFF; addr++)
-	{
-		fprintf(fp, "%06x:%04hx\n", addr, memory[addr]);
-	}
-}
 
 /* Interrupt */
 void interrupt(word_t orig_address, unsigned int code, uint8_t device_num)
@@ -155,17 +130,31 @@ void interpret(word_t word)
 	}
 }
 
+void init(void)
+{
+	memory = malloc(POWTWO(24) * sizeof(word_t));
+	memset(memory, 0x00, POWTWO(24) * sizeof(word_t));
+}
+
+void reset(void)
+{
+	int temp;
+	PC = 0x0000;
+	FIELD = 0x0000;
+	STATUS = 0x0000;
+	sst = 0x0000;
+	sfield = 0x0000;
+	for(i=0; i < 4; i++)
+		AC(i) = 0x0000;
+	MQ = 0x0000;
+
+}
+
 int main (int argc, char **argv)
 {
-	/* Init */
-	memory=calloc(POWTWO(24), 2);
 	FILE *corefile;
 	int opt;
 	
-	/* Reset */
-	PC = 0x0000;
-	FIELD = 0x0000;
-
 	/* Parse Arguments */
 	while((opt = getopt(argc, argv, "hf:s:")) != -1)
 	{
@@ -190,11 +179,10 @@ int main (int argc, char **argv)
 				exit(0);
 		}
 	}
-
-	while(ST_STAT_MASK(word) != 0x7)
-	{
-
-	}
+	init();
+	reset();
+	main_loop();
+	cleanup();
 	return 0;
 }
 
