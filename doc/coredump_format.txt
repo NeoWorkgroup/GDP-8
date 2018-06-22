@@ -1,0 +1,55 @@
+DCC GDP-8 Core File Format
+==========================
+
+Big Endian Stream Tramsmission
+
+Header: (Format version and Flags)
++---+---+---+---+---+---+---+---+
+|     MAGIC!    |VERSION|CNT|FMT|
++---+---+---+---+---+---+---+---+
+|    J U N K    | 0 | 0 | C | F |
++---+---+---+---+---+---+---+---+
+↑ Figure 1-1 (One Bit per Cell)
+
+	JUNK: Not used
+	VERSION: File Format version
+	CNT: (Content)
+		0:	Dump of Memory Content
+		1:	Executable
+	FMT: (Format)
+		0:	RIM, Every Word is prefixed with Address
+		1:	BIN, A Start Address followed by Words
+
+Block: (RIM Format)
++---+---+---+---+---+
+|MSB     LSB|MSB LSB|
++---+---+---+---+---+
+|  A D D R  |W O R D|
++---+---+---+---+---+
+|     3     |   2   |
++---+---+---+---+---+
+↑ Figure 1-2 (One Byte per Cell)
+
+Start Address: (BIN Format) (After Header)
++-----------+
+|MSB     LSB|
++---+---+---+
+|  A D D R  |
++---+---+---+
+|     3     |
++---+---+---+
+
+Data Word: (BIN Format) (After Start Address)
++-------+
+|MSB LSB|
++---+---+
+|D A T A|
++---+---+
+|   2   |
++---+---+
+
+File Construction:
+	BIN:
+		HEADER, ADDRESS, DATA......., EOF
+	RIM:
+		HEADER, BLOCK........, EOF
