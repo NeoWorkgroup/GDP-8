@@ -33,20 +33,6 @@ word_t *memory;
 /* 16 Bit, Memory Addressing (and 8 bit field) */
 word_t pc=0;
 
-dev_desc_t dev_table[256]=
-{
-	{"CPU", cpu_handler, 0x00, 0x00},
-	{"CON", console_handler, 0x01, 0x01},
-	/*
-	{"CLK", clock_handler, 0x02, 0x02},
-	{"MUX", terminal_handler, 0x10, 0x1F},
-	{"DSK", disk_handler, 0x20, 0x2F},
-	{"TAP", tape_handler, 0x30, 0x3F},
-	{"NET", network_handler, 0x40, 4F},
-	{"MON", monitor_handler, 0x50, 0x5F}
-	*/
-};
-
 /* Interrupt */
 void interrupt(word_t orig_address, unsigned int code, uint8_t device_num)
 {
