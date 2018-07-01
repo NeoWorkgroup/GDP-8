@@ -1,0 +1,11 @@
+Device Number Assign
+====================
+
+0x00 ~ 0x0F:	CPU, Console, Paper Tape, Memory Field Switching
+0x10 ~ 0x1F:	16 x Terminal Multiplexer
+0x20 ~ 0x2F:	 8 x Disk Controller
+0x30 ~ 0x3F:	 8 x Magnetic Tape Controller
+0x40 ~ 0x4F:	16 x Simple Serial Line like Network
+0x50 ~ 0x5F:	 8 x Graphic Terminals (Vector)
+0x60 ~ 0x6F:	 4 x Monitor (Raster), Keyboard, Mouse, Audio
+0x70 ~ 0x7F:	16 x Generic File IO Driver
