@@ -84,38 +84,38 @@
 	(l = (x & 0x1))
 
 /* Combine Field and Address */
-#define FADDR(f, a) \
+#define FIELDADDR(f, a) \
 	((f << 16) | a)
 
 /* Get Page Address's Real Address */
-#define PADDR(p, a) \
+#define PAGEADDR(p, a) \
 	((p & 0xFF00) | a)
 
 /* Get Real Address */
 /* Code Field, Address */
-#define CADDRESS(f, p, a) \
-	(((field & 0xFF00) << 8) | ((p & 0xff00) | addr))
+#define CFIELD(f, a) \
+	(((field & 0xFF00) << 8) | addr)
 
 /* Data Field, Page Address */
-#define DADDRESS(f, p, a) \
-	(((f & 0x00FF) << 16) | ((p & 0xff00) | a))
+#define DFIELD(f, a) \
+	(((f & 0x00FF) << 16) | a)
 
 /* Common Combined Usage */
 /* Indirect Address (Indirect from CODE FIELD to DATA FIEL) */
 #define IMEM(f, p, word) \
-	(memory[(((field & 0x00FF) << 16) | memory[(((field & 0xFF00) << 8) | ((p & 0xFF00) | (word & 0x00FF)))])])
+	(MEM(DFIELD(MEM(CFIELD(f, PAGEADDR(p, (word & 0x00FF)))))))
 
 /* Address only */
 #define IADDR(field, p, word) \
-	(memory[(((field & 0xFF00) << 8) | ((p & 0xFF00) | (word & 0x00FF)))])
+	(DFIELD(MEM(CFIELD(f, PAGEADDR(p, (word & 0x00FF))))))
 
 /* Direct Access from CODE FIELD */
 #define DMEM(f, p, word) \
-	(memory[(((field & 0xFF00) << 8) | ((p & 0xff00) | (word & 0x00FF)))])
+	(MEM(CFIELD(f, PAGEADDR(p, (word & 0x00FF)))))
 
 // /* Address Only */
 #define DADDR(field, p, word) \
-	(((p & 0xff00) | (word & 0x00FF)))
+	(CFIELD(f, PAGEADDR(p, (word & 0x00FF))))
 
 /* Power of 2 */
 #define POWTWO(exp) \
