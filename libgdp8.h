@@ -133,10 +133,10 @@ typedef void (*DEV_HANDLER)(uint8_t, uint8_t);
 #define JMP	0x5
 #define IOT	0x6
 #define OPR	0x7
-#define PSH	0x8
-#define POP	0x9
-#define CAL	0xA
-#define RET	0xB
+#define LOAD	0x8
+#define XOR	0x9
+#define PUSH	0xA
+#define POP	0xB
 #define EUM	0xC
 #define INT	0xD
 #define SYS	0xE

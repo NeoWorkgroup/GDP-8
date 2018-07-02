@@ -6,19 +6,19 @@ Instructions:
 OP	NAME	USE AC?		DESCRIPTION
 0	AND	YES		AND AC with the Target
 1	ADD	YES		ADD the Accumulator with the Target
-2	ISZ	NO		ADD the Target, and skip next instruction if result is zero
+2	ISZ	NO		ADD the Target by 1, and skip next instruction if result is zero
 3	DEP	YES		Deposit the Accumulator into the Target
 4	JMS	NO		Jump to the Subroutine
 5	JMP	NO		Jump to the Target
 6	IOT	YES		I/O Transfer
 7	OPR	YES		Operations
-8	PSH	YES		Push into Stack
-9	POP	YES		Pop off Stack
-A	CAL	YES		Call function
-B	RET	YES		Return (Ignores Address)
+8	LOAD	YES		Load the Taget into the Accumulator
+9	XOR	YES		XOR the Accumulator with the Target
+A	PUSH	YES		Push into Stack
+B	POP	YES		Pop off Stack
 C	EUM	NO		Enter Usermode at the Address
 D	INT	YES		Interrupt, same Format as IOT
-E	SYS	YES		System Call, same Format as IOT, triggers a Interrupt
+E	SYS	YES		System Call, same Format as IOT, triggers a Special Interrupt
 F	STP	NO		Halt, Halt and Catch Fire, Report Bug, or STOP
 
 Notation:
@@ -155,7 +155,7 @@ Status Code:
 3:	System Call
 4:	Usermode Interrupt
 5:	Trap
-6:	STP, HLT, OSR, Cross Field JMP, and JMS in Usermode
+6:	No Permission, STP, HLT, OSR, Cross Field JMP, and JMS in Usermode
 7:	BUG in Kernel Mode, KERNEL PANIC
 
 Field Format:
