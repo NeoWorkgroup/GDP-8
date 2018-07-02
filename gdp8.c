@@ -44,7 +44,7 @@ void interrupt(word_t orig_address, unsigned int code, uint8_t device_num)
 	/* Set interrupt reason */
 	st=(st & 0xF800) | (code << 8);
 	st=(st & 0x00FF) | device_num;
-	field|=0xFF00;
+	field&=0x00FF;
 	/* Same effect as JMS */
 	MEM(0x000000)=orig_address;
 	PC=0x1;
