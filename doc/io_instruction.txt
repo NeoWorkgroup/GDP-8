@@ -1,0 +1,78 @@
+IO Instructions
+===============
+
+Port 0x00:	CPU Internal (CPU)
+Code:
+	0x0:	Enable Interrupt
+	0x1:	Disable Interrupt
+	0x2:	Clear All Flags
+	0x3:	If Interrupt is enabled, skip next instruction
+	0x5:	If GT == 1, skip next instruction
+	0x4:	If STAT == 2 (Device), skip next instruction
+	0x6:	if STAT == 3 (System Call), skip next instruction
+	0x7:	if STAT == 4 (Usermode Interrupt), skip next instruction
+	0x8:	if STAT == 5 (Trap), skip next instruction
+	0x9:	if STAT == 6 (No Permission), skip next instruction
+	0xA:	Set Field
+	0xB:	Set STATUS
+	0xC:	Get Field
+	0xD:	Get STATUS
+	0xE:	Restore Field
+	0xF:	Restore STATUS
+
+Port 0x01:	Main Console (CON)
+Code:
+EII	0x0:	Enable Input Interrupt
+EOI	0x1:	Enable Output Interrupt
+DII	0x2:	Disable Input Interrupt
+DOI	0x3:	Disable Output Interrupt
+SIF	0x4:	Set Input Flag
+SOF	0x5:	Set Output Flag
+CIF	0x6:	Clear Input Flag
+CIA	0x7:	Clear Input Flag and AC0
+COF	0x8:	Clear Output Flag
+IFSK	0x9:	If Input Flag is On, skip next instruction
+OFSK	0xA:	If Output Flag is set, skip next instruction
+IOSK	0xB:	If Input or Output Flag is set, skip next instruction
+RA	0xC:	Read Input (OR) into AC0 (Lower 8 Bit)
+WA	0xD:	Write content of AC0 (Lower 8 Bit)
+CRA	0xE:	Clear Input Flag and AC0, then Read Input into AC0
+CWA	0xF:	Clear Output Flag and Write content of AC0 (Lower 8 Bit)
+
+Port 0x02:	Paper Tape Reader/Puncher (PT)
+Code:
+EI	0x0:	Enable Interrupt
+DI	0x1:	Disable Interrupt
+RFSK	0x2:	If Read Flag is set, skip next instruction
+PFSK	0x3:	If Punch Flag is set, skip next instruction
+CRF	0x4:	Clear Read Flag
+CPF	0x5:	Clear Punch Flag
+RPA	0x6:	Read into AC0 (Lower 8 Bit, OR)
+PPA	0x7:	Punch AC0 (Lower 8 Bit)
+CRR	0x8:	Clear Read Flag, and Read into AC0 (Lower 8 Bit, OR)
+CPP	0x9:	Clear Punch Flag, Punch AC0 (Lower 8 Bit)
+	0xA:
+	0xB:
+	0xC:
+	0xD:
+	0xE:
+	0xF:
+
+Port 0x03:	Clock (CLK)
+Code:
+EI	0x0:	Enable Interrupt
+DI	0x1:	Disable Interrupt
+CSK	0x2:	If is on Clock Flag is set, skip next instruction
+CCF	0x3:	Clear Clock Flag
+	0x4:
+	0x5:
+	0x6:
+	0x7:
+	0x8:
+	0x9:
+	0xA:
+	0xB:
+	0xC:
+	0xD:
+	0xE:
+	0xF:
