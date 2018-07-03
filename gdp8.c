@@ -36,8 +36,8 @@ word_t pc=0;
 /* Interrupt */
 void interrupt(word_t orig_address, unsigned int code, uint8_t device_num)
 {
-	extern word_t *memory, pc;
-	extern word_t field, st, sst, sfield;
+	/* Disable Interrupt to prevent nested interrupt */
+	STATUS |= 0x1000;
 	/* Save Original Content */
 	sst=st; 
 	sfield=field;
