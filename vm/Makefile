@@ -1,14 +1,14 @@
 CC = clang
 CFLAGS=-O2 -g -pipe -Wall -Wextra -I.
-
+PROG_PREFIX=
 # Use this if you are interested in debugging Compilers
 #CFLAGS = -Ofast -gfull -gdwarf-5 -Wall -Wextra -pipe -static -march=native -fPIE -flto -I.
 
 all: gdp8
 syntax:
 	$(CC) $(CFLAGS) -fsyntax-only *.c
-gdp8:	gdp8.o io.o inst.c
-	$(CC) $(LDFLAGS) -o gdp8 \
+gdp8:	gdp8.o io.o inst.o
+	$(CC) $(LDFLAGS) -o $(PROG_PREFIX)gdp8 \
 		gdp8.o io.o inst.o
 gdp8.o:
 	$(CC) $(CFLAGS) -c ${.PREFIX}.c

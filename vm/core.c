@@ -18,21 +18,27 @@ int32_t getaddrint(FILE *fp)
 	temp |= fgetc(fp);
 	if(temp == EOF)
 		return EOF;
-	temp <<= 16;
 	temp |= fgetc(fp) << 8;
-	temp |= fgetc(fp);
+	temp |= fgetc(fp) << 16;
 	return temp;
 }
 
 int32_t getdataint(FILE *fp)
 {
 	int32_t temp=0;
-	temp |= fgetc(fp);
+	temp |= fgetc(fp) << 8;
 	if(temp == EOF)
 		return EOF;
-	temp <<= 8;
 	temp |= fgetc(fp);
 	return temp;
+}
+
+int32_t putaddrint(FILE *fp, uint32_t word)
+{
+}
+
+int32_t putdataint(FILE *fp, uint32_t word)
+{
 }
 
 int read_core(word_t *memory, FILE *fp)
@@ -48,6 +54,7 @@ int read_core(word_t *memory, FILE *fp)
 			data = getdataint(fp);
 			if(data == EOF)
 				return EOF;
+			MEM(addr) = (uint16_t)data;
 			count++;
 		}
 		return count;
@@ -63,4 +70,15 @@ int read_core(word_t *memory, FILE *fp)
 		return count;
 	}
 	return EOF; /* You shouldn't be here */
+}
+
+int write_core(uint8_t flag, uint32_t start_address, uint32_t end_address, FILE *fp)
+{
+	int32_t addr=start_address;
+	if(flag & 0x0001) /* Is RIM */
+	{
+		while((addr >= start_address) && (addr <= end_address))
+		{
+		}
+	}
 }
