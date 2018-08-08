@@ -33,12 +33,22 @@ int32_t getdataint(FILE *fp)
 	return temp;
 }
 
-int32_t putaddrint(FILE *fp, uint32_t word)
+int32_t putaddrint(FILE *fp, uint32_t addr)
 {
+	uint32_t temp=addr;
+	putc(temp & 0xFF, fp);
+	temp >>= 8;
+	putc(temp & 0xFF, fp);
+	temp >>= 8;
+	putc(temp & 0xFF, fp);
 }
 
-int32_t putdataint(FILE *fp, uint32_t word)
+int32_t putdataint(FILE *fp, uint16_t word)
 {
+	uint16_t temp=word;
+	putc(temp & 0xFF, fp);
+	temp >>= 8;
+	putc(temp & 0xFF, fp);
 }
 
 int read_core(word_t *memory, FILE *fp)
@@ -62,7 +72,7 @@ int read_core(word_t *memory, FILE *fp)
 	else /* Is BIN */
 	{
 		addr = getaddrint(fp); /* Initial Address */
-		while((unsure_data = getdataint(fp)) != EOF)
+		while((data = getdataint(fp)) != EOF)
 		{
 			MEM(addr++) = (word_t)data;
 			count++;
@@ -74,11 +84,26 @@ int read_core(word_t *memory, FILE *fp)
 
 int write_core(uint8_t flag, uint32_t start_address, uint32_t end_address, FILE *fp)
 {
-	int32_t addr=start_address;
+	int32_t addr;
+	addr=start_address;
+	putc(flag, fp);
 	if(flag & 0x0001) /* Is RIM */
 	{
-		while((addr >= start_address) && (addr <= end_address))
+		while(addr <= end_address)
 		{
+			putaddrint(fp, addr);
+			putdataint(fp, MEM(addr));
+			addr++;
 		}
 	}
+	else
+	{
+		putaddrint(fp, addr);
+		while(addr <= end_address);
+		{
+			putdataint(fp, MEM(addr));
+			addr++;
+		}
+	}
+	return addr;
 }
