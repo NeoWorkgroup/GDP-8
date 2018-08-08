@@ -100,23 +100,6 @@
 #define DFIELD(f, a) \
 	(((f & 0x00FF) << 16) | a)
 
-/* Common Combined Usage */
-/* Indirect Address (Indirect from CODE FIELD to DATA FIEL) */
-#define IMEM(f, p, word) \
-	(MEM(DFIELD(MEM(CFIELD(f, PAGEADDR(p, (word & 0x00FF)))))))
-
-/* Address only */
-#define IADDR(field, p, word) \
-	(DFIELD(MEM(CFIELD(f, PAGEADDR(p, (word & 0x00FF))))))
-
-/* Direct Access from CODE FIELD */
-#define DMEM(f, p, word) \
-	(MEM(CFIELD(f, PAGEADDR(p, (word & 0x00FF)))))
-
-// /* Address Only */
-#define DADDR(field, p, word) \
-	(CFIELD(f, PAGEADDR(p, (word & 0x00FF))))
-
 /* Power of 2 */
 #define POWTWO(exp) \
 	(1 << exp)
@@ -133,8 +116,8 @@ typedef void (*DEV_HANDLER)(uint8_t, uint8_t);
 #define JMP	0x5
 #define IOT	0x6
 #define OPR	0x7
-#define LOAD	0x8
-#define XOR	0x9
+#define CALL	0x8
+#define RET	0x9
 #define PUSH	0xA
 #define POP	0xB
 #define EUM	0xC

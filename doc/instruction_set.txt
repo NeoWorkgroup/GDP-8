@@ -12,8 +12,8 @@ OP	NAME	USE AC?		DESCRIPTION
 5	JMP	NO		Jump to the Target
 6	IOT	YES		I/O Transfer
 7	OPR	YES		Operations
-8	LOAD	YES		Load the Taget into the Accumulator
-9	XOR	YES		XOR the Accumulator with the Target
+8	CALL	YES		Call Function
+9	RET	YES		Return
 A	PUSH	YES		Push into Stack
 B	POP	YES		Pop off Stack
 C	EUM	NO		Enter Usermode at the Address
@@ -32,6 +32,7 @@ Registers:
 	PC:		Program Counter
 	L:		The Link
 	STATUS:		Status
+	FIELD:		Code Field and Data Field
 
 Special Address:
 	0x(FF)0000:		Interrupt Handler
