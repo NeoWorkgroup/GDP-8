@@ -15,7 +15,7 @@
 int32_t getaddrint(FILE *fp)
 {
 	int32_t temp=0;
-	temp |= fgetc(fp);
+	temp=fgetc(fp);
 	if(temp == EOF)
 		return EOF;
 	temp |= fgetc(fp) << 8;
@@ -26,10 +26,10 @@ int32_t getaddrint(FILE *fp)
 int32_t getdataint(FILE *fp)
 {
 	int32_t temp=0;
-	temp |= fgetc(fp) << 8;
+	temp = fgetc(fp);
 	if(temp == EOF)
 		return EOF;
-	temp |= fgetc(fp);
+	temp |= fgetc(fp) << 8;
 	return temp;
 }
 
@@ -96,7 +96,7 @@ int write_core(uint8_t flag, uint32_t start_address, uint32_t end_address, FILE 
 			addr++;
 		}
 	}
-	else
+	else /* Is BIN */
 	{
 		putaddrint(fp, addr);
 		while(addr <= end_address);
