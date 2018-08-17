@@ -27,12 +27,14 @@ Notation:
 	<ACx,MQ>:	= (AC(x) << 16) | MQ
 
 Registers:
-	AC0~AC3:	Accumulator
-	MQ:		Multiplier Quotient
-	PC:		Program Counter
-	L:		The Link
-	STATUS:		Status
-	FIELD:		Code Field and Data Field
+	AC0~AC3	(16 Bit):	Accumulator
+	MQ	(16 Bit):		Multiplier Quotient
+	PC	(16 Bit):		Program Counter
+	L	( 1 Bit):		The Link
+	STATUS	(16 Bit):		Status
+	CFIELD	(16 Bit):		Code Field and Stack Field
+	DFIELD	(16 Bit):		Data Field and Indirect Field
+	
 
 Special Address:
 	0x(FF)0000:		Interrupt Handler
@@ -76,7 +78,7 @@ OPR Instruction Format:
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 |     O   P     |   A   |  G:0  | I |CLW|CLL|RVW|RVL|ROR|ROL|TWO| ==> Group 1
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|     O   P     |   A   |  G:1  | I |CLW|ICW|SMW|SZW|SNL|REV|OSR| ==> Group 2
+|     O   P     |   A   |  G:1  | I |CLW|ICW|SNW|SZW|SNL|REV|OSR| ==> Group 2
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 |     O   P     |   A   |  G:2  | I |CLW|MTW|WTM| Arithmetic OP | ==> Group 3
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -102,7 +104,7 @@ TWO:	Rotate 2 Bits, if(ROR==0 && ROL==0), Swap upper and lower half
 ICW:	Increment WORD
 OSR:	OR the content of Panel Buttons into WORD
 
-SMW:	Skip if WORD is negative
+SNW:	Skip if WORD is negative
 SZW:	Skip if WORD is 0x0000
 SNL:	Skip if L is 0
 REV: Reverse the Condition of SMA, SZA, and SNL
