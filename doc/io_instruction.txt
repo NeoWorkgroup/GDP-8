@@ -3,22 +3,22 @@ IO Instructions
 
 Port 0x00:	CPU Internal (CPU)
 Code:
-	0x0:	Enable Interrupt
-	0x1:	Disable Interrupt
-	0x2:	Clear All Flags
-	0x3:	If Interrupt is enabled, skip next instruction
-	0x5:	If GT == 1, skip next instruction
-	0x4:	If STAT == 2 (Device), skip next instruction
-	0x6:	if STAT == 3 (System Call), skip next instruction
-	0x7:	if STAT == 4 (Usermode Interrupt), skip next instruction
-	0x8:	if STAT == 5 (Trap), skip next instruction
-	0x9:	if STAT == 6 (No Permission), skip next instruction
-	0xA:	Set Field
-	0xB:	Set STATUS
-	0xC:	Get Field
-	0xD:	Get STATUS
-	0xE:	Restore Field
-	0xF:	Restore STATUS
+EI	0x0:	Enable Interrupt
+DI	0x1:	Disable Interrupt
+CAF	0x2:	Clear All Flags
+SKIE	0x3:	If Interrupt is enabled, skip next instruction
+SKGT	0x5:	If GT == 1, skip next instruction
+SKDV	0x4:	If STAT == 2 (Device), skip next instruction
+SKSC	0x6:	if STAT == 3 (System Call), skip next instruction
+SKUI	0x7:	if STAT == 4 (Usermode Interrupt), skip next instruction
+SKTP	0x8:	if STAT == 5 (Trap), skip next instruction
+SKNP	0x9:	if STAT == 6 (No Permission), skip next instruction
+SST	0xA:	Set STATUS
+GST	0xB:	Get STATUS
+RST	0xC:	Restore STATUS
+	0xD:
+	0xE:
+HALT	0xF:	Halt
 
 Port 0x01:	Main Console (CON)
 Code:
@@ -59,6 +59,8 @@ CPP	0x9:	Clear Punch Flag, Punch AC0 (Lower 8 Bit)
 	0xF:
 
 Port 0x03:	Clock (CLK)
+Note:
+	Interrupts 10 times per second
 Code:
 EI	0x0:	Enable Interrupt
 DI	0x1:	Disable Interrupt
@@ -66,6 +68,27 @@ CSK	0x2:	If is on Clock Flag is set, skip next instruction
 CCF	0x3:	Clear Clock Flag
 	0x4:
 	0x5:
+	0x6:
+	0x7:
+	0x8:
+	0x9:
+	0xA:
+	0xB:
+	0xC:
+	0xD:
+	0xE:
+	0xF:
+
+Port 0x04:	Time Sharing Controller (TSC)
+Note:
+	Default is to interrupt 100 times per second
+Code:
+EI	0x0:	Enable Interrupt
+DI	0x1:	Disable Interrupt
+PTCS	0x2:	If is on the point to do context switch, skip next instruction
+CLPF	0x3:	Clear Context Switch Flag
+SETC	0x4:	Set Cycle Time of Context Switch, in micro-second per cycle
+GETC	0x5:	Get Cycle Time of Context Switch
 	0x6:
 	0x7:
 	0x8:
