@@ -10,5 +10,13 @@ Due to the use of Hexdecimal, nearly everything is aligned to 4 Bit.
 Our goal is to create a modern "minicomputer", just like DEC's PDP-8 or PDP-11
 
 Because my C programming level is somewhat poor, it may not reach the goal :(
+
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *                      DCC GDP-8                      *
+	 * digital computer corpration, general data processor *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
 ## Reference:
 [PDP-8/E Assembly](http://homepage.divms.uiowa.edu/~jones/pdp8/man/)
