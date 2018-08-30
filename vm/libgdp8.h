@@ -16,14 +16,11 @@
 
 #define AC(x) ac[x]
 #define MQ mq
-#define STATUS st
+#define STATUS status
 #define MEM(x) memory[x]
 #define PC pc
-#define FIELD field
 #define L ((st & 0x8000) >> 15)
 #define SC sc
-#define CF ((field & 0xFF00) >> 8)
-#define DF (field & 0x00FF)
 
 /* Define some macros to simplify things */
 #define INST_MASK(word) \
@@ -90,15 +87,6 @@
 /* Get Page Address's Real Address */
 #define PAGEADDR(p, a) \
 	((p & 0xFF00) | a)
-
-/* Get Real Address */
-/* Code Field, Address */
-#define CFIELD(f, a) \
-	(((field & 0xFF00) << 8) | addr)
-
-/* Data Field, Page Address */
-#define DFIELD(f, a) \
-	(((f & 0x00FF) << 16) | a)
 
 /* Power of 2 */
 #define POWTWO(exp) \
