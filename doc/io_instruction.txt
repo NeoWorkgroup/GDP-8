@@ -1,6 +1,8 @@
 IO Instructions
 ===============
 
+IO Instructions normally perform operations on the first Accumulator (AC0)
+
 Port 0x00:	CPU Internal (CPU)
 Code:
 EI	0x0:	Enable Interrupt
@@ -99,3 +101,22 @@ GETC	0x5:	Get Cycle Time of Context Switch
 	0xD:
 	0xE:
 	0xF:
+
+Port 0x05:	Memory Management Controller (MMC)
+Code:
+	0x0:	Set Code Field to Lower 8 Bit
+	0x1:	Set Stack Field to Lower 8 Bit
+	0x2:	Set Data Field to Lower 8 Bit
+	0x3:	Set Indirect Field to Lower 8 Bit
+	0x4:	Set Code Field (High) and Stack Field (Low)
+	0x5:	Set Data Field (High) and Indirect Field (Low)
+	0x6:	Get Code Field
+	0x7:	Get Stack Field
+	0x8:	Get Data Field
+	0x9:	Get Indirect Field
+	0xA:	Get Code Field (High) and Stack Field (Low)
+	0xB:	Set Data Field (High) and Indirect Field (Low)
+	0xC:
+	0xD:
+	0xE:	Enable Fallthrough Field
+	0xF:	Disable Fallthrough Field
