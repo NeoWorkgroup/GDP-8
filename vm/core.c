@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <libgdp8.h>
 
+extern word_t *memory;
+
 /* Get Address (24 Bit) from Byte Stream */
 int32_t getaddrint(FILE *fp)
 {
@@ -99,7 +101,7 @@ int write_core(uint8_t flag, uint32_t start_address, uint32_t end_address, FILE 
 	else /* Is BIN */
 	{
 		putaddrint(fp, addr);
-		while(addr <= end_address);
+		while(addr <= end_address)
 		{
 			putdataint(fp, MEM(addr));
 			addr++;

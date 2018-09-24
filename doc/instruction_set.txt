@@ -22,7 +22,7 @@ E	SYS	YES		System Call, same Format as IOT, triggers a Special Interrupt
 F	STP	NO		Halt, Halt and Catch Fire, Report Bug, or STOP
 
 Notation:
-	0x(XX)YYYY: XX -> Field, YYYY -> Address
+	0x(XX)YYYY: XX -> Field, Address -> Real Address
 	<L,WORD>:	= (L << 16) | WORD
 	<ACx,MQ>:	= (AC(x) << 16) | MQ
 

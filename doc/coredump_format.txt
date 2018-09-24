@@ -1,7 +1,7 @@
 DCC GDP-8 Core File Format
 ==========================
 
-Big Endian Stream Tramsmission
+Little Endian Stream Tramsmission
 
 Header: (Format version and Flags)
 +---+---+---+---+---+---+---+---+

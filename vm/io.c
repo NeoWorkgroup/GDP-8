@@ -12,8 +12,8 @@
 #include <unistd.h>
 #include <libgdp8.h>
 
-extern word_t ac[4], mq, st, field, sst, sfield, *memory, pc;
-extern uint8_t sc;
+extern struct registers_s registers;
+extern word_t *memory;
 
 void console_handler(uint8_t device, uint8_t code)
 {

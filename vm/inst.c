@@ -12,8 +12,8 @@
 #include <unistd.h>
 #include <libgdp8.h>
 
-extern word_t ac[4], mq, st, field, sst, sfield, *memory, pc;
-extern uint8_t sc;
+extern struct registers_s registers;
+extern word_t *memory;
 
 /* Normal Rotate */
 uint16_t rotl(uint16_t word, uint8_t count)
@@ -41,6 +41,14 @@ void lwrotl(uint16_t *word, uint16_t *status)
 	*word=((temp << 1) | (*status >> 15));
 	*status=((*status & 0x7FFF) | ((temp & 0x8000) << 15));
 	return;
+}
+
+word_t read_mem(int indirect, word_t address, uint8_t field)
+{
+	word_t temp;
+	if(address >= 0x20 && address <= 0x2F)
+		return MEM(FIELDADDR(field, address))++;
+	return MEM(FIELDADDR(field, address))++;
 }
 
 /* 0x0:AND */
@@ -120,4 +128,69 @@ void inst_sys(word_t word)
 /* 0xF:STP */
 void inst_stp(word_t word)
 {
+}
+
+void interpret(word_t word)
+{
+	switch(INST_MASK(word))
+	{
+		case AND:
+			inst_and(word);
+			PC++;
+			return;
+		case ADD:
+			inst_add(word);
+			PC++;
+			return;
+		case ISZ:
+			inst_isz(word);
+			PC++;
+			return;
+		case DEP:
+			inst_dep(word);
+			PC++;
+			return;
+		case JMS:
+			inst_jms(word);
+			return;
+		case JMP:
+			inst_jmp(word);
+			return;
+		case IOT:
+			inst_iot(word);
+			PC++;
+			return;
+		case OPR:
+			inst_opr(word);
+			PC++;
+			return;
+		case PSH:
+			inst_psh(word);
+			PC++;
+			return;
+		case POP:
+			inst_pop(word);
+			PC++;
+			return;
+		case CAL:
+			inst_cal(word);
+			return;
+		case RET:
+			inst_ret(word);
+			return;
+		case EUM:
+			inst_eum(word);
+			return;
+		case INT:
+			inst_int(word);
+			return;
+		case SYS:
+			inst_sys(word);
+			return;
+		case STP:
+			inst_stp(word);
+			return;
+		default:
+			return;
+	}
 }

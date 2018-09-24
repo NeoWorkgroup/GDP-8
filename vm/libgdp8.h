@@ -14,13 +14,13 @@
 #define TRUE	1
 #define FALSE	0
 
-#define AC(x) ac[x]
-#define MQ mq
-#define STATUS status
+#define AC(x) registers.ac[x]
+#define MQ registers.mq
+#define STATUS registers.status
 #define MEM(x) memory[x]
-#define PC pc
-#define L ((st & 0x8000) >> 15)
-#define SC sc
+#define PC registers.pc
+#define L ((registers.status & 0x8000) >> 15)
+#define SC registers.sc
 
 /* Define some macros to simplify things */
 #define INST_MASK(word) \
@@ -94,6 +94,23 @@
 
 typedef uint16_t word_t;
 typedef void (*DEV_HANDLER)(uint8_t, uint8_t);
+
+struct fields_s
+{
+	uint8_t code;
+	uint8_t stack;
+	uint8_t data;
+	uint8_t indirect;
+};
+
+struct registers_s
+{
+	word_t ac[4], mq;
+	word_t status;
+	uint8_t sc;
+	word_t pc;
+	struct fields_s field;
+} registers;
 
 /* Instruction Definitions */
 #define AND	0x0
