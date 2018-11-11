@@ -7,14 +7,16 @@ PROG_PREFIX=
 all: gdp8
 syntax:
 	$(CC) $(CFLAGS) -fsyntax-only *.c
-gdp8:	gdp8.o io.o inst.o
+gdp8:	gdp8.o io.o inst.o core.o
 	$(CC) $(LDFLAGS) -o $(PROG_PREFIX)gdp8 \
-		gdp8.o io.o inst.o
+		gdp8.o io.o inst.o core.o
 gdp8.o:
 	$(CC) $(CFLAGS) -c ${.PREFIX}.c
 io.o:
 	$(CC) $(CFLAGS) -c ${.PREFIX}.c
 inst.o:
+	$(CC) $(CFLAGS) -c ${.PREFIX}.c
+core.o:
 	$(CC) $(CFLAGS) -c ${.PREFIX}.c
 
 coretest:

@@ -90,18 +90,19 @@ void inst_iot(word_t word)
 void inst_opr(word_t word)
 {
 }
-/* 0x8:LOAD */
-void inst_load(word_t word)
+
+/* 0x8:CALL */
+void inst_call(word_t word)
 {
 }
 
-/*0x9:XOR */
-void inst_xor(word_t word)
+/*0x9:RET */
+void inst_ret(word_t word)
 {
 }
 
 /* 0xA:PUSH */
-void inst_psh(word_t word)
+void inst_push(word_t word)
 {
 }
 
@@ -164,16 +165,16 @@ void interpret(word_t word)
 			inst_opr(word);
 			PC++;
 			return;
-		case PSH:
-			inst_psh(word);
+		case PUSH:
+			inst_push(word);
 			PC++;
 			return;
 		case POP:
 			inst_pop(word);
 			PC++;
 			return;
-		case CAL:
-			inst_cal(word);
+		case CALL:
+			inst_call(word);
 			return;
 		case RET:
 			inst_ret(word);

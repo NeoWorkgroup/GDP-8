@@ -110,7 +110,7 @@ struct registers_s
 	uint8_t sc;
 	word_t pc;
 	struct fields_s field;
-} registers;
+};
 
 /* Instruction Definitions */
 #define AND	0x0
@@ -153,3 +153,7 @@ void lwrotl(uint16_t *word, uint16_t *status);
 
 /* Device Handlers */
 void console_handler(uint8_t device, uint8_t code);
+
+/* Memory Core */
+int read_core(word_t *memory, FILE *fp);
+int write_core(uint8_t flag, uint32_t start_address, uint32_t end_address, FILE *fp);

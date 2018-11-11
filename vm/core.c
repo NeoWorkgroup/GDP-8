@@ -89,7 +89,7 @@ int write_core(uint8_t flag, uint32_t start_address, uint32_t end_address, FILE 
 	int32_t addr;
 	addr=start_address;
 	putc(flag, fp);
-	if(flag & 0x0001) /* Is RIM */
+	if(flag & 0x01) /* Is RIM */
 	{
 		while(addr <= end_address)
 		{
