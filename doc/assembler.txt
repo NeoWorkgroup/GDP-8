@@ -1,21 +1,18 @@
 Assembler Syntax
 ================
+; It will be like this:
 
-The syntax of GDP-8's Assembler is similar to PDP-8's,
-but our IOT have "namespaces", different device's pulse code name
-won't interfere.
-It will be like this:
-
-/ This is a simple comment
-/ Label is limited to 31 character long
-
-*100	/ Starting Address (Hex)
-CLEAR,	IOT CPU CAF
-	CLA CLL
-	IOT CPU HLT
-COUNT,	CLA CLL
-	ISZ TEMP
-	JMP .-1
-	JMP CLEAR
-TEMP,	#0	/ Note that constants are in hexdecimal, not octal
+; This is a simple comment
+; Label is limited to 63 character long
+A==0	; Define A as hexdecimal 0
+.ADDR	100	; Starting Address (Hex)
+START:	CLR
+	LOAD %A, TEMP
+	HLT
+COUNT:	CLR
+	INC %A
+	RJZ +2
+	RJMP -2
+	JMP START
+TEMP:	#0	; Note that constants are in hexdecimal, not octal
 

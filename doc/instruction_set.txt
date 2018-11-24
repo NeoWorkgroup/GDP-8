@@ -1,176 +1,150 @@
 DCC GDP-8 Instruction Set
 =========================
 
+A 64 Bit, 24 Bit Address, Byte-based Flat-Address Model, Load Store Architecture Virtual Machine.
+
 Instructions:
+	OP:	TYPE:	DESCRIPTION:
+	HLT	Z	Halt
+	INT	U	Trigger a software Interrupt, IV=$ARG
+	EUM	LJC	Enter Usermode at $ADDR
+	IRET	Z	Return from Interrupt Service Routine
+	LOAD	LS	Load from $ADDR
+	LOADI	LS	Indirect load from $ADDR
+	ST	LS	Store to $ADDR
+	STI	LS	Indirect store to $ADDR
+	ILOAD	ISL	Load from $ADD + %INDEX
+	ILOADI	ISL	Indirect load from $ADD + %INDEX
+	IST	ILS	Store to $ADDR + %INDEX
+	ISTI	ILS	Indirect store to $ADDR + %INDEX
+	SAVE	Z	Push all register to stack
+	RSTR	Z	Pop all register from stack
+	ADD	D	Add
+	SUB	D	Subtract
+	INC	U	Increment
+	DEC	U	Decrement
+	MUL	D	Multipy
+	DIV	D	Divide
+	MOD	D	Modulo
+	AND	D	And
+	NAND	D	Not-And
+	OR	D	Or
+	NOT	U	Not
+	XOR	D	XOR
+	ROTR	U	Rotate Right
+	ROTL	U	Rotate Left
+	SHR	U	Shift Right
+	SHL	U	Shift Left
+	SWP	D	Swap content of register
+	PUSH	U	Push
+	POP	U	Pop
+	CMP	D	Compare (Sets / Clears E and G)
+	TCH	U	Touch (Set / Clear Z and N)
+	RST	Z	Reset all flags
+	JMP	JC	Jump to $ADDR
+	JMS	JC	Jump to Subroutine $ADDR
+	J*	JC	Jump to $ADDR if the flag is true
+	CALL	JC	Call $ADDR
+	C*	JC	Call $ADDR if the flag is true
+	SJMP	SJC	Jump to $ADDR
+	SJMS	SJC	Jump to Subroutine $ADDR
+	SJ*	SJC	Jump to $ADDR if the flag is true
+	SCALL	SJC	Call $ADDR
+	SC*	SJC	Call $ADDR if the flag is true
+	LJMP	LJC	Jump to $ADDR
+	LJMS	LJC	Jump to Subroutine $ADDR
+	LJ*	LJC	Jump to $ADDR if the flag is true
+	LCALL	LJC	Call $ADDR
+	LC*	LJC	Call $ADDR if the flag is true
+	RJMP	RCJ	Jump to %PC + $OFFSET
+	RJMS	RCJ	Jump to Subroutine %PC + $OFFSET
+	RJ*	RCJ	Jump to %PC + $OFFSET if the flag is true
+	RCALL	RCJ	Call %PC + $OFFSET
+	RC*	RCJ	Call %PC + $OFFSET if the flag is true
+	RET	Z	Return
+	IO	IO	IO Operation
 
-OP	NAME	USE AC?		DESCRIPTION
-0	AND	YES		AND AC with the Target
-1	ADD	YES		ADD the Accumulator with the Target
-2	ISZ	NO		ADD the Target by 1, and skip next instruction if result is zero
-3	DEP	YES		Deposit the Accumulator into the Target
-4	JMS	NO		Jump to the Subroutine
-5	JMP	NO		Jump to the Target
-6	IOT	YES		I/O Transfer
-7	OPR	YES		Operations
-8	CALL	YES		Call Function
-9	RET	YES		Return
-A	PUSH	YES		Push into Stack
-B	POP	YES		Pop off Stack
-C	EUM	NO		Enter Usermode at the Address
-D	INT	YES		Interrupt, same Format as IOT
-E	SYS	YES		System Call, same Format as IOT, triggers a Special Interrupt
-F	STP	NO		Halt, Halt and Catch Fire, Report Bug, or STOP
-
-Notation:
-	0x(XX)YYYY: XX -> Field, Address -> Real Address
-	<L,WORD>:	= (L << 16) | WORD
-	<ACx,MQ>:	= (AC(x) << 16) | MQ
 
 Registers:
-	AC0~AC3	(16 Bit):	Accumulator
-	MQ	(16 Bit):		Multiplier Quotient
-	PC	(16 Bit):		Program Counter
-	L	( 1 Bit):		The Link
-	STATUS	(16 Bit):		Status
-	CFIELD	(16 Bit):		Code Field and Stack Field
-	DFIELD	(16 Bit):		Data Field and Indirect Field
+	00~FF	(64 Bit):	General Purpose Register
+	STATUS	(16 Bit):	Status
+	PC	(24 Bit):	Program Counter
+	SP	(24 Bit):	Stack Pointer
+	IV	( 8 Bit):	Interrupt Vector
+	IPC	(24 Bit):	Saved PC from Interrupt
 	
 
-Special Address:
-	0x(FF)0000:		Interrupt Handler
-	0x0020~0x002F:	Auto Increment (If Indirect)
+Instruction Formats:
 
-Machine Word Format:
+Zero Operand Instruction Format (Z):	(1 Byte)
++---+---+---+---+---+---+---+---+
+|              O P              |
++---+---+---+---+---+---+---+---+
 
-Most Significant Bit         ====>          Least Significant Bit
+One Operand Register Instruction Format (U):	(2 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|1 5|1 4|1 3|1 2|1 1|1 0| 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+|              O P              |           A   R   G           |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+(ARG can be a register number or immediate operand depending on the instruction)
 
-Normal Instruction Format:
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|       4       |   2   | 1 | 1 |               8               |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|      O P      |   A   | I | C |            A D D R            |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+Two Operand Register Instruction Format (D):	(3 Bytes)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|              O P              |           D   S   T           |           S   R   C           |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-I:	Indirect
-C:	Current Page
-A:	Which Accumulator
+Jump/Call Instruction (JC):	(3 Bytes)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|             O   P             |                         A   D   D   R                         |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-No AC Instruction Format:
+Short Jump/Call Instruction (SJC):	(2 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|       4       |   2   | 1 | 1 |               8               |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|      O P      |   F   | I | C |            A D D R            |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-
-I:	Indirect
-C:	Current Page
-F:	Instruction specific Flag
-
-IOT Instruction Format:
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|       4       |               8               |       4       |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|      O P      |          D E V I C E          |    C O D E    |
+|             O   P             |         A   D   D   R         |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-DEVICE:	The target Device
-CODE:	The Pulse Code to Send
+Long Jump/Call Instruction (LJC):	(5 Bytes)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|             O   P             |                                           A   D   D   R                                       |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-OPR Instruction Format:
+Relative Jump/Call Instruction (RJC):	(3 Bytes)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|             O   P             |                     O   F   F   S   E   T                     |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+LOAD / STORE Instruction Format (LS):	(5 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|       4       |   2   |   2   | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+|             O   P             |           R   E   G           |  =>
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|     O   P     |   A   |  G:0  | I |CLW|CLL|RVW|RVL|ROR|ROL|TWO| ==> Group 1
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|                                           A   D   D   R                                       |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Indexed (ILS):			(6 Bytes)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|             O   P             |           R   E   G           |       I   N   D   E   X       |  =>
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|                                     O   F   F   S   E   T                                     |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+IO Instruction Format (IO):		(4 Bytes)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+| 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |           D   E   V           |             O   P             |           R   E   G           |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Status Register Format:
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|     O   P     |   A   |  G:1  | I |CLW|ICW|SNW|SZW|SNL|REV|OSR| ==> Group 2
+| 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |                               |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|     O   P     |   A   |  G:2  | I |CLW|MTW|WTM| Arithmetic OP | ==> Group 3
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|     O   P     |   A   |  G:3  | I |INC|DEC|RNL|RNR|   N U M   | ==> Group 4
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-
-I:	Indirect
-A:	Which Accumulator
-G:	Group 1, 2, 3, or 4
-
-WORD:	if I=0, use AC, if I=1, use *AC
-
-CLW:	Clear WORD
-CLL:	Clear L
-
-RVW:	Reverse WORD
-RVL:	Reverse L
-
-ROR:	Rotate Right
-ROL:	Rotate Left
-TWO:	Rotate 2 Bits, if(ROR==0 && ROL==0), Swap upper and lower half
-
-ICW:	Increment WORD
-OSR:	OR the content of Panel Buttons into WORD
-
-SNW:	Skip if WORD is negative
-SZW:	Skip if WORD is 0x0000
-SNL:	Skip if L is 0
-REV: Reverse the Condition of SMA, SZA, and SNL
-
-MTW:	Store MQ into WORD, and Clear MQ
-WTM:	Store WORD into MQ, and Clear WORD
-
-INC:	Increment by NUM
-DEC:	Decrement by NUM
-RNL: Rotate NUM Bits Left
-RNR:	Rotate NUM Bits Right
-
-Arithmetic OP:
-	CODE	MNEMONIC	COMMENT
-	0:	NOP		No Operation
-	1:	WCS		Load WORD%POWTWO(5) into SC
-	2:	SUB		Subtract
-	3:	MUL		Multiply
-	4:	DVI		Divide
-	5:	NMI		Normalize
-	6:	SHL		Shift Left
-	7:	ASR		Arithmetic Right Shift
-	8:	LSR		Logical Right Shift
-	9:	SCA		AC |= SC
-	A:	DAD		Double Precision Add
-	F:	DSU		Double Precision Subtract
-	B:	DST		Double Precision Store
-	C:	DSZ		Double Precision Skip if 0
-	D:	DPI		Double Precision Increment
-	E:	DRV		Double Precision Reverse
-
-Status Format:
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 |     3     |               8               |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-| L |G T|INT|DIT|U M|  S T A T  |      INTERRUPTING DEVICE      |
+| B | O | N | Z | E | G | U | 1 |                               |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-L:	The Link
-GT:	Greater Than
-INT:	Interrupt
-DIT:	Disabled Interrupt
-UM:	Usermode
-STAT:	Status Code
-INTERRUPTING DEVICE:	The Device which is requesting a interrupt
-
-Status Code:
-0:	Nothing
-1:	Clock Interrupt
-2:	Device Interrupt
-3:	System Call
-4:	Usermode Interrupt
-5:	Trap
-6:	No Permission, STP, HLT, OSR, Cross Field JMP, and JMS in Usermode
-7:	BUG in Kernel Mode, KERNEL PANIC
-
-Field Format:
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|               8               |               8               |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|      C O D E   F I E L D      |      D A T A   F I E L D      |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+B:	The Bit (Can be Carry Flag, or just a 1 Bit register)
+O:	Overflow
+N:	Negative
+Z:	Zero
+E:	Equal
+G:	Greater Than
+U:	Usermode
+I:	Interrupt

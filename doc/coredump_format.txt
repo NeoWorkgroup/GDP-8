@@ -21,13 +21,13 @@ Header: (Format version and Flags)
 		1:	BIN, A Start Address followed by Words
 
 Block: (RIM Format)
-+---+---+---+---+---+
-|MSB     LSB|MSB LSB|
-+---+---+---+---+---+
-|  A D D R  |W O R D|
-+---+---+---+---+---+
-|     3     |   2   |
-+---+---+---+---+---+
++---+---+---+---+---+---+---+---+---+---+---+
+|MSB     LSB|MSB                         LSB|
++---+---+---+---+---+---+---+---+---+---+---+
+|  A D D R  |         W   O   R   D         |
++---+---+---+---+---+---+---+---+---+---+---+
+|     3     |               8               |
++---+---+---+---+---+---+---+---+---+---+---+
 ↑ Figure 1-2 (One Byte per Cell)
 
 Start Address: (BIN Format) (After Header)
@@ -38,15 +38,17 @@ Start Address: (BIN Format) (After Header)
 +---+---+---+
 |     3     |
 +---+---+---+
+↑ Figure 1-3 (One Byte per Cell)
 
 Data Word: (BIN Format) (After Start Address)
-+-------+
-|MSB LSB|
-+---+---+
-|D A T A|
-+---+---+
-|   2   |
-+---+---+
++---+---+---+---+---+---+---+---+
+|MSB                         LSB|
++---+---+---+---+---+---+---+---+
+|         W   O   R   D         |
++---+---+---+---+---+---+---+---+
+|               8               |
++---+---+---+---+---+---+---+---+
+↑ Figure 1-4 (One Byte per Cell)
 
 File Construction:
 	BIN:
