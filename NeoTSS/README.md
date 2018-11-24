@@ -1,6 +1,6 @@
 # NeoTSS Timesharing System
 
-This will be a ITS like, but much more simple than ITS, insecure, slow, useless Timesharing System.
+This will be a strange, insecure, slow, useless Timesharing System.
 
 ## Competents:
 	* Simple 2-Pass Assembler
