@@ -1,2 +1,9 @@
 IO Instructions
 ===============
+
+Device:	CPU
+	EI:	Enable Interrupt
+	DI:	Disable
+	ECLK:	Enable Clock Interrupt
+	DCLK:	Disable
+	PSR:	Read panel switches (to Register)

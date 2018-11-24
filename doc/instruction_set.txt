@@ -42,24 +42,24 @@ Instructions:
 	TCH	U	Touch (Set / Clear Z and N)
 	RST	Z	Reset all flags
 	JMP	JC	Jump to $ADDR
-	JMS	JC	Jump to Subroutine $ADDR
-	J*	JC	Jump to $ADDR if the flag is true
-	CALL	JC	Call $ADDR
-	C*	JC	Call $ADDR if the flag is true
 	SJMP	SJC	Jump to $ADDR
-	SJMS	SJC	Jump to Subroutine $ADDR
-	SJ*	SJC	Jump to $ADDR if the flag is true
-	SCALL	SJC	Call $ADDR
-	SC*	SJC	Call $ADDR if the flag is true
 	LJMP	LJC	Jump to $ADDR
-	LJMS	LJC	Jump to Subroutine $ADDR
-	LJ*	LJC	Jump to $ADDR if the flag is true
-	LCALL	LJC	Call $ADDR
-	LC*	LJC	Call $ADDR if the flag is true
 	RJMP	RCJ	Jump to %PC + $OFFSET
+	JMS	JC	Jump to Subroutine $ADDR
+	SJMS	SJC	Jump to Subroutine $ADDR
+	LJMS	LJC	Jump to Subroutine $ADDR
 	RJMS	RCJ	Jump to Subroutine %PC + $OFFSET
+	J*	JC	Jump to $ADDR if the flag is true
+	SJ*	SJC	Jump to $ADDR if the flag is true
+	LJ*	LJC	Jump to $ADDR if the flag is true
 	RJ*	RCJ	Jump to %PC + $OFFSET if the flag is true
+	CALL	JC	Call $ADDR
+	SCALL	SJC	Call $ADDR
+	LCALL	LJC	Call $ADDR
 	RCALL	RCJ	Call %PC + $OFFSET
+	C*	JC	Call $ADDR if the flag is true
+	SC*	SJC	Call $ADDR if the flag is true
+	LC*	LJC	Call $ADDR if the flag is true
 	RC*	RCJ	Call %PC + $OFFSET if the flag is true
 	RET	Z	Return
 	IO	IO	IO Operation
