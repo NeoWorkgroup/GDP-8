@@ -1,7 +1,7 @@
 IO Instructions
 ===============
 
-Device:	CPU (0x00)
+Device:	CPU	(0x00)
 	EI:	Enable Interrupt
 	DI:	Disable
 	ECLK:	Enable Clock Interrupt
@@ -10,3 +10,11 @@ Device:	CPU (0x00)
 	DPY:	Display Custom data on panel display
 	ABRT:	Reboot, Clear memory, registers, and flags
 	GIV:	Get Interrupt Vector
+Device: CONSOLE	(0x01)
+	EI:	Enable Interrupt
+	DI:	Disable Interrupt
+	OUT:	Write one byte
+	IN:	Read one byte
+	CLR:	Clear screen
+	BEL:	Send Bell
+	RST:	Reset console

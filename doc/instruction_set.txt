@@ -9,14 +9,10 @@ Instructions:
 	INT			U		Trigger a software Interrupt, IV=$ARG
 	EUM			LJC		Enter Usermode at $ADDR
 	IRET			Z		Return from Interrupt Service Routine
-	LOAD			LS		Load from $ADDR
-	LOADI			LS		Indirect load from $ADDR
-	ST			LS		Store to $ADDR
-	STI			LS		Indirect store to $ADDR
-	ILOAD			ILS		Load from $ADD + %INDEX
-	ILOADI			ILS		Indirect load from $ADD + %INDEX
-	IST			ILS		Store to $ADDR + %INDEX
-	ISTI			ILS		Indirect store to $ADDR + %INDEX
+	{,I}LOAD{,I}		{,I}LS		Load
+	{,I}ST{,I}		{,I}LS		Store
+	{,I}LDB{,I}		{,I}LS		Load Byte
+	{,I}STB{,I}		{,I}LS		Store Byte
 	SAVE			Z		Push all register to stack
 	RSTR			Z		Pop all register from stack
 	ADD			D		Add
@@ -42,10 +38,10 @@ Instructions:
 	CMP			D		Compare (Sets / Clears E and G)
 	TCH			U		Touch (Set / Clear Z and N)
 	RST			Z		Reset all flags
-	{,I}{,S,R,L}JMP		{,S,R,L}JC	Jump to $ADDR
-	{,I}{,S,R,L}J[BONZEGUI]	{,S,R,L}JC	Jump to $ADDR if the flag is true
-	{,I}{,S,R,L}CALL	{,S,R,L}JC	Call $ADDR
-	{,I}{,S,R,L}C[BONZEGUI]	{,S,R,L}JC	Call $ADDR if the flag is true
+	{,I}{,S,R,L}JMP		{,S,R,L}JC	Jump
+	{,I}{,S,R,L}J[BONZEGUI]	{,S,R,L}JC	Jump if the flag is true
+	{,I}{,S,R,L}CALL	{,S,R,L}JC	Call
+	{,I}{,S,R,L}C[BONZEGUI]	{,S,R,L}JC	Call if the flag is true
 	RET			Z		Return
 	IO			IO		IO Operation
 
