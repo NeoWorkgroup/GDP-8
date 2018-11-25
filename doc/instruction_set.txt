@@ -82,7 +82,7 @@ Short Jump/Call Instruction (SJC):	(3 Bytes)
 |              O P              |   |S I Z E| I | C | CONDITION |         A   D   D   R         |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-Long Jump/Call Instruction (LJC):	(6 Bytes)
+Long Jump/Call Instruction (LJC):	(5 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 |              O P              |   |S I Z E| I | C | CONDITION |  =>
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
