@@ -9,10 +9,14 @@ Instructions:
 	INT	U		Trigger a software Interrupt, IV=$ARG
 	EUM	LJC		Enter Usermode at $ADDR
 	IRET	Z		Return from Interrupt Service Routine
-	LOAD	{,I}LS		Load
-	ST	{,I}LS		Store
-	LDB	{,I}LS		Load Byte
-	STB	{,I}LS		Store Byte
+	LOAD	LS		Load
+	ST	LS		Store
+	LDB	LS		Load Byte
+	STB	LS		Store Byte
+	ILOAD	ILS		Load
+	IST	ILS		Store
+	ILDB	ILS		Load Byte
+	ISTB	ILS		Store Byte
 	SAVE	Z		Push all register to stack
 	RSTR	Z		Pop all register from stack
 	ADD	D		Add
