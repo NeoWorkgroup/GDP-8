@@ -7,3 +7,5 @@ Device:	CPU
 	ECLK:	Enable Clock Interrupt
 	DCLK:	Disable
 	PSR:	Read panel switches (to Register)
+	DPY:	Display Custom data on panel display
+	ABRT:	Reboot, Clear memory, registers, and flags
