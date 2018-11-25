@@ -40,6 +40,8 @@ Instructions:
 	POP	U		Pop
 	CMP	D		Compare (Sets / Clears E and G)
 	TCH	U		Touch (Set / Clear Z and N)
+	STF	U		Set flags
+	GTF	U		Get flags
 	RST	Z		Reset all flags
 	JMP	{N,S,L,R}JC	Jump
 	J	{N,S,L,R}JC	Jump if the flag is true
