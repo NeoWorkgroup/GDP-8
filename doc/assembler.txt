@@ -1,5 +1,5 @@
-Assembler Syntax
-================
+; Assembler Syntax
+; ================
 ; This is a simple comment
 ; All symbol is limited to 63 character long
 
@@ -10,9 +10,11 @@ START:	CLR
 	HLT
 COUNT:	CLR
 	INC	%A
-	J	R,Z,+2	; Relative condition jump (signed integer)
-	J	R,Z,-2
-	JMP START
-TEMP:	#0	; Note that constants are in hexdecimal, not octal
-	.ASCII	"Hello, World!\n"	; ASCII Encoded Text
+	J	R, Z, +2		; Relative condition jump (signed integer)
+	J	R, Z, -2
+	JMP	S, @NOPE		; @ means indirect access, target is always Long Address,
+	JMP	@NOPE			; if address length is unspecified, like this, assmebler will try to guess
 
+TEMP:	.HEX	0			; Note that constants are in hexdecimal, not octal
+HW:	.ASCII	"Hello, World!\n"	; ASCII Encoded Text
+NOPE:	START	; Contains full address (Long Address) (3 Bytes)

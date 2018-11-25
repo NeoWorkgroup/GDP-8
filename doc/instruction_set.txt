@@ -1,7 +1,7 @@
 DCC GDP-8 Architecture
 ======================
 
-A 64 Bit, 24 Bit Address, Byte-based Flat-Address Model, Load Store Architecture Virtual Machine.
+A 64 Bit, 24 Bit Address, Little-Endian Byte-based Flat-Address Model, Load Store Architecture Virtual Machine.
 
 Instructions:
 	OP:	TYPE:		DESCRIPTION:
@@ -15,8 +15,8 @@ Instructions:
 	STB	LS		Store Byte
 	ILOAD	ILS		Load
 	IST	ILS		Store
-	ILDB	ILS		Load Byte
-	ISTB	ILS		Store Byte
+	ILDB	ILS		Load Byte into Lower 8 Bit
+	ISTB	ILS		Store Byte of Lower 8 Bit
 	SAVE	Z		Push all register to stack
 	RSTR	Z		Pop all register from stack
 	ADD	D		Add
@@ -41,10 +41,10 @@ Instructions:
 	CMP	D		Compare (Sets / Clears E and G)
 	TCH	U		Touch (Set / Clear Z and N)
 	RST	Z		Reset all flags
-	JMP	{,S,L,R}JC	Jump
-	J	{,S,L,R}JC	Jump if the flag is true
-	CALL	{,S,L,R}JC	Call
-	C	{,S,L,R}JC	Call if the flag is true
+	JMP	{N,S,L,R}JC	Jump
+	J	{N,S,L,R}JC	Jump if the flag is true
+	CALL	{N,S,L,R}JC	Call
+	C	{N,S,L,R}JC	Call if the flag is true
 	RET	Z		Return
 	IO	IO		IO Operation
 
@@ -76,7 +76,7 @@ Two Operand Register Instruction Format (D):	(3 Bytes)
 |              O P              |           D   S   T           |           S   R   C           |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-Jump/Call Instruction (JC):	(4 Bytes)
+Normal Jump/Call Instruction (NJC):	(4 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 |              O P              |   |S I Z E| I | C | CONDITION |                         A   D   D   R                         |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
