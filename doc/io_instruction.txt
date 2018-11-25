@@ -1,7 +1,7 @@
 IO Instructions
 ===============
 
-Device:	CPU
+Device:	CPU (0x00)
 	EI:	Enable Interrupt
 	DI:	Disable
 	ECLK:	Enable Clock Interrupt
@@ -9,3 +9,4 @@ Device:	CPU
 	PSR:	Read panel switches (to Register)
 	DPY:	Display Custom data on panel display
 	ABRT:	Reboot, Clear memory, registers, and flags
+	GIV:	Get Interrupt Vector

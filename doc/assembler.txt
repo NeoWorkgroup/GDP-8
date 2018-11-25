@@ -1,17 +1,16 @@
 Assembler Syntax
 ================
-; It will be like this:
-
 ; This is a simple comment
 ; Label is limited to 63 character long
-A==0	; Define A as hexdecimal 0
+
+A==0		; Define A as hexdecimal 0
 .ADDR	100	; Starting Address (Hex)
 START:	CLR
 	LOAD %A, TEMP
 	HLT
 COUNT:	CLR
 	INC %A
-	RJZ +2
+	RJZ +2	; Relative condition jump (signed integer)
 	RJMP -2
 	JMP START
 TEMP:	#0	; Note that constants are in hexdecimal, not octal

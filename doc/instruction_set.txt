@@ -1,73 +1,58 @@
-DCC GDP-8 Instruction Set
-=========================
+DCC GDP-8 Architecture
+======================
 
 A 64 Bit, 24 Bit Address, Byte-based Flat-Address Model, Load Store Architecture Virtual Machine.
 
 Instructions:
-	OP:	TYPE:	DESCRIPTION:
-	HLT	Z	Halt
-	INT	U	Trigger a software Interrupt, IV=$ARG
-	EUM	LJC	Enter Usermode at $ADDR
-	IRET	Z	Return from Interrupt Service Routine
-	LOAD	LS	Load from $ADDR
-	LOADI	LS	Indirect load from $ADDR
-	ST	LS	Store to $ADDR
-	STI	LS	Indirect store to $ADDR
-	ILOAD	ISL	Load from $ADD + %INDEX
-	ILOADI	ISL	Indirect load from $ADD + %INDEX
-	IST	ILS	Store to $ADDR + %INDEX
-	ISTI	ILS	Indirect store to $ADDR + %INDEX
-	SAVE	Z	Push all register to stack
-	RSTR	Z	Pop all register from stack
-	ADD	D	Add
-	SUB	D	Subtract
-	INC	U	Increment
-	DEC	U	Decrement
-	MUL	D	Multipy
-	DIV	D	Divide
-	MOD	D	Modulo
-	AND	D	And
-	NAND	D	Not-And
-	OR	D	Or
-	NOT	U	Not
-	XOR	D	XOR
-	ROTR	U	Rotate Right
-	ROTL	U	Rotate Left
-	SHR	U	Shift Right
-	SHL	U	Shift Left
-	SWP	D	Swap content of register
-	PUSH	U	Push
-	POP	U	Pop
-	CMP	D	Compare (Sets / Clears E and G)
-	TCH	U	Touch (Set / Clear Z and N)
-	RST	Z	Reset all flags
-	JMP	JC	Jump to $ADDR
-	SJMP	SJC	Jump to $ADDR
-	LJMP	LJC	Jump to $ADDR
-	RJMP	RCJ	Jump to %PC + $OFFSET
-	JMS	JC	Jump to Subroutine $ADDR
-	SJMS	SJC	Jump to Subroutine $ADDR
-	LJMS	LJC	Jump to Subroutine $ADDR
-	RJMS	RCJ	Jump to Subroutine %PC + $OFFSET
-	J*	JC	Jump to $ADDR if the flag is true
-	SJ*	SJC	Jump to $ADDR if the flag is true
-	LJ*	LJC	Jump to $ADDR if the flag is true
-	RJ*	RCJ	Jump to %PC + $OFFSET if the flag is true
-	CALL	JC	Call $ADDR
-	SCALL	SJC	Call $ADDR
-	LCALL	LJC	Call $ADDR
-	RCALL	RCJ	Call %PC + $OFFSET
-	C*	JC	Call $ADDR if the flag is true
-	SC*	SJC	Call $ADDR if the flag is true
-	LC*	LJC	Call $ADDR if the flag is true
-	RC*	RCJ	Call %PC + $OFFSET if the flag is true
-	RET	Z	Return
-	IO	IO	IO Operation
+	OP:			TYPE:		DESCRIPTION:
+	HLT			Z		Halt
+	INT			U		Trigger a software Interrupt, IV=$ARG
+	EUM			LJC		Enter Usermode at $ADDR
+	IRET			Z		Return from Interrupt Service Routine
+	LOAD			LS		Load from $ADDR
+	LOADI			LS		Indirect load from $ADDR
+	ST			LS		Store to $ADDR
+	STI			LS		Indirect store to $ADDR
+	ILOAD			ILS		Load from $ADD + %INDEX
+	ILOADI			ILS		Indirect load from $ADD + %INDEX
+	IST			ILS		Store to $ADDR + %INDEX
+	ISTI			ILS		Indirect store to $ADDR + %INDEX
+	SAVE			Z		Push all register to stack
+	RSTR			Z		Pop all register from stack
+	ADD			D		Add
+	SUB			D		Subtract
+	INC			U		Increment
+	DEC			U		Decrement
+	MUL			D		Multipy
+	DIV			D		Divide
+	MOD			D		Modulo
+	AND			D		And
+	NAND			D		Not-And
+	OR			D		Or
+	NOT			U		Not
+	XOR			D		XOR
+	ROTR			U		Rotate Right
+	ROTL			U		Rotate Left
+	SHR			U		Shift Right
+	SHL			U		Shift Left
+	SWP			D		Swap content of register
+	MOV			D		Move %SRC to %DST
+	PUSH			U		Push
+	POP			U		Pop
+	CMP			D		Compare (Sets / Clears E and G)
+	TCH			U		Touch (Set / Clear Z and N)
+	RST			Z		Reset all flags
+	{,I}{,S,R,L}JMP		{,S,R,L}JC	Jump to $ADDR
+	{,I}{,S,R,L}J[BONZEGUI]	{,S,R,L}JC	Jump to $ADDR if the flag is true
+	{,I}{,S,R,L}CALL	{,S,R,L}JC	Call $ADDR
+	{,I}{,S,R,L}C[BONZEGUI]	{,S,R,L}JC	Call $ADDR if the flag is true
+	RET			Z		Return
+	IO			IO		IO Operation
 
 
 Registers:
 	00~FF	(64 Bit):	General Purpose Register
-	STATUS	(16 Bit):	Status
+	STATUS	( 8 Bit):	Status
 	PC	(24 Bit):	Program Counter
 	SP	(24 Bit):	Stack Pointer
 	IV	( 8 Bit):	Interrupt Vector
@@ -92,29 +77,31 @@ Two Operand Register Instruction Format (D):	(3 Bytes)
 |              O P              |           D   S   T           |           S   R   C           |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-Jump/Call Instruction (JC):	(3 Bytes)
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|             O   P             |                         A   D   D   R                         |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-
-Short Jump/Call Instruction (SJC):	(2 Bytes)
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|             O   P             |         A   D   D   R         |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-
-Long Jump/Call Instruction (LJC):	(5 Bytes)
+Jump/Call Instruction (JC):	(4 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|             O   P             |                                           A   D   D   R                                       |
+|              O P              |   |S I Z E| I | C | CONDITION |                         A   D   D   R                         |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-Relative Jump/Call Instruction (RJC):	(3 Bytes)
+Short Jump/Call Instruction (SJC):	(3 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|             O   P             |                     O   F   F   S   E   T                     |
+|              O P              |   |S I Z E| I | C | CONDITION |         A   D   D   R         |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+
+Long Jump/Call Instruction (LJC):	(6 Bytes)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|              O P              |   |S I Z E| I | C | CONDITION |  =>
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|                                           A   D   D   R                                       |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+Relative Jump/Call Instruction (RJC):	(4 Bytes)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|              O P              |   |S I Z E| I | C | CONDITION |                     O   F   F   S   E   T                     | (Two's Completment signed OFFSET)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 LOAD / STORE Instruction Format (LS):	(5 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|             O   P             |           R   E   G           |  =>
+|         O   P         | I |IND|           R   E   G           |  =>
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 |                                           A   D   D   R                                       |
@@ -125,7 +112,7 @@ Indexed (ILS):			(6 Bytes)
 |             O   P             |           R   E   G           |       I   N   D   E   X       |  =>
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|                                     O   F   F   S   E   T                                     |
+|                                           A   D   D   R                                       |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 IO Instruction Format (IO):		(4 Bytes)
@@ -134,11 +121,11 @@ IO Instruction Format (IO):		(4 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
 Status Register Format:
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |                               |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-| B | O | N | Z | E | G | U | I |                               |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
++---+---+---+---+---+---+---+---+
+| 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
++---+---+---+---+---+---+---+---+
+| B | O | N | Z | E | G | U | I |
++---+---+---+---+---+---+---+---+
 
 B:	The Bit (Can be Carry Flag, or just a 1 Bit register)
 O:	Overflow
@@ -148,3 +135,9 @@ E:	Equal
 G:	Greater Than
 U:	Usermode
 I:	Interrupt
+
+
+Interrupt Handling:
+When a interrupt is occurred, CPU will disable Interrupt, Jump to 0xF00000 + %IV,
+after Interrupt Service Routine finished interrupt handling, a IRET instruction will
+enable Interrupt again, and restore the original %PC
