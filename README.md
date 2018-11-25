@@ -4,9 +4,7 @@
 
 ## Introduction:
 
-DCC GDP-8 is a Virtual Machine similar to DEC PDP-8, with 16 bit Machine Word.
-It has 16 Bit Memory Address and 8 Bit Field.
-Due to the use of Hexdecimal, nearly everything is aligned to 4 Bit.
+DCC GDP-8 is a 64 bit virtual machine with 24 bit memory address.
 Our goal is to create a modern "minicomputer", just like DEC's PDP-8 or PDP-11
 
 Because my C programming level is somewhat poor, it may not reach the goal :(
@@ -16,7 +14,3 @@ Because my C programming level is somewhat poor, it may not reach the goal :(
 	 *                      DCC GDP-8                      *
 	 * digital computer corpration, general data processor *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-
-## Reference:
-[PDP-8/E Assembly](http://homepage.divms.uiowa.edu/~jones/pdp8/man/)
