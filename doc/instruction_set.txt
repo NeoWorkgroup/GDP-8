@@ -4,46 +4,45 @@ DCC GDP-8 Architecture
 A 64 Bit, 24 Bit Address, Byte-based Flat-Address Model, Load Store Architecture Virtual Machine.
 
 Instructions:
-	OP:			TYPE:		DESCRIPTION:
-	HLT			Z		Halt
-	INT			U		Trigger a software Interrupt, IV=$ARG
-	EUM			LJC		Enter Usermode at $ADDR
-	IRET			Z		Return from Interrupt Service Routine
-	{,I}LOAD{,I}		{,I}LS		Load
-	{,I}ST{,I}		{,I}LS		Store
-	{,I}LDB{,I}		{,I}LS		Load Byte
-	{,I}STB{,I}		{,I}LS		Store Byte
-	SAVE			Z		Push all register to stack
-	RSTR			Z		Pop all register from stack
-	ADD			D		Add
-	SUB			D		Subtract
-	INC			U		Increment
-	DEC			U		Decrement
-	MUL			D		Multipy
-	DIV			D		Divide
-	MOD			D		Modulo
-	AND			D		And
-	NAND			D		Not-And
-	OR			D		Or
-	NOT			U		Not
-	XOR			D		XOR
-	ROTR			U		Rotate Right
-	ROTL			U		Rotate Left
-	SHR			U		Shift Right
-	SHL			U		Shift Left
-	SWP			D		Swap content of register
-	MOV			D		Move %SRC to %DST
-	PUSH			U		Push
-	POP			U		Pop
-	CMP			D		Compare (Sets / Clears E and G)
-	TCH			U		Touch (Set / Clear Z and N)
-	RST			Z		Reset all flags
-	{,I}{,S,R,L}JMP		{,S,R,L}JC	Jump
-	{,I}{,S,R,L}J[BONZEGUI]	{,S,R,L}JC	Jump if the flag is true
-	{,I}{,S,R,L}CALL	{,S,R,L}JC	Call
-	{,I}{,S,R,L}C[BONZEGUI]	{,S,R,L}JC	Call if the flag is true
-	RET			Z		Return
-	IO			IO		IO Operation
+	OP:	TYPE:		DESCRIPTION:
+	HLT	Z		Halt
+	INT	U		Trigger a software Interrupt, IV=$ARG
+	EUM	LJC		Enter Usermode at $ADDR
+	IRET	Z		Return from Interrupt Service Routine
+	LOAD	{,I}LS		Load
+	ST	{,I}LS		Store
+	LDB	{,I}LS		Load Byte
+	STB	{,I}LS		Store Byte
+	SAVE	Z		Push all register to stack
+	RSTR	Z		Pop all register from stack
+	ADD	D		Add
+	SUB	D		Subtract
+	INC	U		Increment
+	DEC	U		Decrement
+	MUL	D		Multipy
+	DIV	D		Divide
+	MOD	D		Modulo
+	AND	D		And
+	OR	D		Or
+	NOT	U		Not
+	XOR	D		XOR
+	ROTR	U		Rotate Right
+	ROTL	U		Rotate Left
+	SHR	U		Shift Right
+	SHL	U		Shift Left
+	SWP	D		Swap content of register
+	MOV	D		Move %SRC to %DST
+	PUSH	U		Push
+	POP	U		Pop
+	CMP	D		Compare (Sets / Clears E and G)
+	TCH	U		Touch (Set / Clear Z and N)
+	RST	Z		Reset all flags
+	JMP	{,S,L,R}JC	Jump
+	J	{,S,L,R}JC	Jump if the flag is true
+	CALL	{,S,L,R}JC	Call
+	C	{,S,L,R}JC	Call if the flag is true
+	RET	Z		Return
+	IO	IO		IO Operation
 
 
 Registers:
