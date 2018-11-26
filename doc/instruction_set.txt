@@ -61,13 +61,13 @@ Instructions:
 	JMP	JC		Jump
 	JMS	JC		Jump to Subroutine
 	JR	RJC		Conditional or Relative Jump
-	JR	RJC		Conditional or Relative Jump to Subroutine
+	JSR	RJC		Conditional or Relative Jump to Subroutine
+	SRET	Z (NO)		Subroutine Return
 
 	Call:
-	CALL	{N,S,L,R}JC	Call
-	C	{N,S,L,R}JC	Call if the flag is true
+	CALL	JC		Call
+	CR	RJC		Call if the flag is true
 	RET	Z (NO)		Return
-	SRET	Z (NO)		Subroutine Return
 
 Registers:
 	00~FF	(64 Bit):	General Purpose Register
