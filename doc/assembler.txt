@@ -4,17 +4,20 @@
 ; All symbol is limited to 63 character long
 
 A==0		; Define A as hexdecimal 0
+B==1		; Define B as 0x01
 .ADDR	100	; Starting Address (Hex)
-START:	CLR
-	LOAD	%A, TEMP
+START:	RST
+	LOAD	L, %A, TEMP
+	LOAD	L, %A, TEMP:%B	; Indexed
 	HLT
-COUNT:	CLR
-	INC	%A
-	J	R, Z, +2		; Relative condition jump (signed integer)
-	J	R, Z, -2
-	JMP	S, @NOPE		; @ means indirect access, target is always Long Address,
-	JMP	@NOPE			; if address length is unspecified, like this, assmebler will try to guess
+COUNT:	RST			; Reset all flag
+	INC	%A		; Increment, if result is 0, set Z flag
+	IO	CPU, DPY, %A	; Display data
+	JR	Z, +2		; Relative condition jump (signed integer)
+	JR	X, -2		; Unconditionally relative jump
+	JMP	@NOPE		; @ means indirect access
 
-TEMP:	.HEX	0			; Note that constants are in hexdecimal, not octal
-HW:	.ASCII	"Hello, World!\n"	; ASCII Encoded Text
-NOPE:	START	; Contains full address (Long Address) (3 Bytes)
+TEMP:	.LONG	0		; Note that constants are in hexdecimal, not octal
+HW:	.ASCII	"WOW\n"		; ASCII Encoded Text
+ABYTE:	.BYTE	0xFF		; One byte
+NOPE:	.ADDR	START		; Contains 3-byte address

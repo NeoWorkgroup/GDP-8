@@ -8,11 +8,17 @@ Device:	CPU	(0x00)
 	DCLK:	Disable
 	PSR:	Read panel switches (to Register)
 	DPY:	Display Custom data on panel display
-	ABRT:	Reboot, Clear memory, registers, and flags
 	GIV:	Get Interrupt Vector
+	ABRT:	Reboot, Clear memory, registers, and flags
+	CORE:	Make a coredump ((void(*)())0)()
+	GSP:	Get stack address
+	SSP:	Set stack address
+	GRP:	Get subroutine address
+	SRP:	Set subroutine address
+	GPC:	Get PC
+	GIPC:	Get IPC
+
 Device: CONSOLE	(0x01)
-	EI:	Enable Interrupt
-	DI:	Disable Interrupt
 	OUT:	Write one byte
 	IN:	Read one byte
 	CLR:	Clear screen
