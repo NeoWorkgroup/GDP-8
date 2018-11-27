@@ -3,19 +3,21 @@
 ; This is a simple comment
 ; All symbol is limited to 63 character long
 
-A==0		; Define A as hexdecimal 0
-B==1		; Define B as 0x01
+A==R00
+B==R01
 .ADDR	100	; Starting Address (Hex)
-START:	RST
-	LOAD	L, %A, TEMP
+START:	CLR
+	LOAD	L, %A, TEMP	; Normal
 	LOAD	L, %A, TEMP:%B	; Indexed
+	LI	%A, #0		; Intermediate
 	HLT
-COUNT:	RST			; Reset all flag
+COUNT:	CLR			; Clear all flag
 	INC	%A		; Increment, if result is 0, set Z flag
 	IO	CPU, DPY, %A	; Display data
 	JR	Z, +2		; Relative condition jump (signed integer)
 	JR	X, -2		; Unconditionally relative jump
-	JMP	@NOPE		; @ means indirect access
+	J	@NOPE		; @ means indirect access
+	JR	X, @NOPE	; Same effect as above
 
 TEMP:	.WORD	0		; Note that constants are in hexdecimal, not octal
 HW:	.ASCII	"WOW\n"		; ASCII Encoded Text
