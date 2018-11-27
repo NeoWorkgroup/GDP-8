@@ -15,6 +15,9 @@ Instructions:
 	Special:
 	NOP	Z (NO)		Nope
 	HLT	Z (NO)		Halt
+	SLP	IF (NO)		Sleep milliseconds
+	WAIT	Z (NO)		Wait for interrupt
+	IDLE	Z (NO)		CPU idle
 	INT	U (NO)		Trigger a software Interrupt, IV=$ARG
 	EUM	LJC (NO)	Enter Usermode at $ADDR
 	SYS	SYS (YES)	System Call
