@@ -17,7 +17,7 @@ COUNT:	RST			; Reset all flag
 	JR	X, -2		; Unconditionally relative jump
 	JMP	@NOPE		; @ means indirect access
 
-TEMP:	.LONG	0		; Note that constants are in hexdecimal, not octal
+TEMP:	.WORD	0		; Note that constants are in hexdecimal, not octal
 HW:	.ASCII	"WOW\n"		; ASCII Encoded Text
 ABYTE:	.BYTE	0xFF		; One byte
 NOPE:	.ADDR	START		; Contains 3-byte address
