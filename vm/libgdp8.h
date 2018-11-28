@@ -21,20 +21,64 @@ typedef uint8_t memory_t;
 
 enum InstructionList
 {
-	NOP, HLT, BRK, SLP, WAIT,
-	IDLE, INT, EUM, SYS, IO, IRET,
-	LD, ST, LI, LIW,
-	ADD, SUB, INC, DEC, MUL, DIV, MOD,
-	ADDI, SUBI, INCI, DECI,
-	AND, OR, NOT, XOR,
-	RTR, RTL, SHR, SHL,
-	RTBR, RTBL, SHBR, SHBL,
-	SWP, MOV, PUSH, POP,
-	CMP, TCH, STB, CLB, CLR,
-	J, JS, JR, JSR, RS,
-	C, CR, R,
-	INST_OPS
+	NOP=	0x00,
+	HLT=	0x01,
+	BRK=	0x02,
+	SLP=	0x03,
+	WAIT=	0x04,
+	IDLE=	0x05,
+	INT=	0x06,
+	EUM=	0x07,
+	SYS=	0x08,
+	IO=	0x09,
+	IRET=	0x0A,
+	LD=	0x10,
+	ST=	0x11,
+	LI=	0x12,
+	LIW=	0x13,
+	ADD=	0x20,
+	SUB=	0x21,
+	INC=	0x22,
+	DEC=	0x23,
+	MUL=	0x24,
+	DIV=	0x25,
+	MOD=	0x26,
+	ADDI=	0x27,
+	SUBI=	0x28,
+	INCI=	0x29,
+	DECI=	0x2A,
+	AND=	0x30,
+	OR=	0x31,
+	NOT=	0x32,
+	XOR=	0x33,
+	RTR=	0x34,
+	RTL=	0x35,
+	SHR=	0x36,
+	SHL=	0x37,
+	RTBR=	0x38,
+	RTBL=	0x39,
+	SHBR=	0x3A,
+	SHBL=	0x3B,
+	SWP=	0x40,
+	MOV=	0x41,
+	PUSH=	0x50,
+	POP=	0x51,
+	CMP=	0x60,
+	TCH=	0x61,
+	STB=	0x62,
+	CLB=	0x63,
+	CLR=	0x64,
+	J=	0x70, /* And 0x71 */
+	JS=	0x72, /* And 0x73 */
+	JR=	0x74,
+	JSR=	0x75,
+	RS=	0x76,
+	C=	0x80, /* And 0x81 */
+	CR=	0x82,
+	R=	0x83
 };
+
+#define OP_INSTS 55
 
 struct Register
 {
@@ -139,6 +183,7 @@ struct CPU
 
 struct InterpretHandler
 {
+	bit_t defined;
 	byte_t size;
 	void(*handler)(struct CPU *cpu, struct Instruction *inst);
 };
