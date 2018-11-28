@@ -15,6 +15,7 @@ Instructions:
 	Special:
 	NOP	Z (NO)		Nope
 	HLT	Z (NO)		Halt
+	BRK	Z (NO)		Break
 	SLP	IF (NO)		Sleep milliseconds
 	WAIT	Z (NO)		Wait for interrupt
 	IDLE	Z (NO)		CPU idle
@@ -91,7 +92,7 @@ Registers:
 	STATUS	( 8 Bit):	Status
 	PC	(24 Bit):	Program Counter
 	SP	(24 Bit):	Stack Pointer
-	RP	(24 Bit):	Subroutine Return Address
+	SRA	(24 Bit):	Subroutine Return Address
 	IV	( 8 Bit):	Interrupt Vector
 	IPC	(24 Bit):	Saved PC from Interrupt
 
@@ -109,18 +110,6 @@ Zero Operand Instruction Format (Z):	(1 Byte)
 +---+---+---+---+---+---+---+---+
 |             O   P             |
 +---+---+---+---+---+---+---+---+
-
-LOAD / STORE Instruction Format (LS):	(6 Bytes)
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|             O   P             |IND|   I N D E X   | I |S I Z E|           R   E   G           |	==>
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-|                                       A   D   D   R                                           |
-+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-(Size:	L = 64 Bit, A = 24 Bit, B = 8 Bit)
-(I:	Indirect)
-(IND:	Indexed)
-(INDEX:	Which register to use (X0 ~ XF))
 
 One Operand (U):	(2 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -162,6 +151,18 @@ Relative Jump/Call (RJC):	(4 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 (Condition: X (Unconditionally), B, O, N, Z, E, G)
 
+LOAD / STORE Instruction Format (LS):	(6 Bytes)
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|             O   P             |IND|   I N D E X   | I |S I Z E|           R   E   G           |	==>
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+|                                       A   D   D   R                                           |
++---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+(Size:	L = 64 Bit, A = 24 Bit, B = 8 Bit)
+(I:	Indirect)
+(IND:	Indexed)
+(INDEX:	Which register to use (X0 ~ XF))
+
 System Call (IO):	(4 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 |             O   P             |           N   U   M           |           R   E   G           |           R   E   G           |
@@ -194,6 +195,6 @@ Memory Mapping:	(Just convention, no actual protection)
 0xF01000~0xFFFFFF: ( 1020K)	Might be MMIO in the Future
 
 Interrupt Handling:
-When a interrupt is occurred, CPU will disable Interrupt, Jump to 0xF00000 + (%IV * 16),
+When a interrupt is occurred, CPU will disable Interrupt, Jump to 0xF00000 + (%IV << 4),
 after Interrupt Service Routine finished interrupt handling, a IRET instruction will
 enable Interrupt again, and restore the original %PC
