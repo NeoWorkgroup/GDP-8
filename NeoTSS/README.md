@@ -3,11 +3,12 @@
 This will be a strange, insecure, slow, useless Timesharing System.
 
 ## Competents:
-	* Simple 2-Pass Assembler
-	* Fast but useless compiled language compiler
-	* Tape Archiver
 	* Small Kernel
-	* Networking Ability (UUCP-Like)
-	* ed(1) like Text Editor (Without Regular Expression)
+	* DDT like Debugger used as Shell
 	* Slow Filesystem (NeoFS)
-	* DDT like Debugger (But in Hex), used as Shell
+	* Simple 2-Pass Assembler
+	* Object Linker
+	* Maybe I will port some C Compiler
+	* Tape Archiver
+	* Networking Ability
+	* ed(1) like Text Editor
