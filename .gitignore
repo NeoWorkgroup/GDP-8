@@ -1,6 +1,5 @@
 gdp8*
+assembler
 *.o
 a.out
-b.out
-coretest
 .*.swp

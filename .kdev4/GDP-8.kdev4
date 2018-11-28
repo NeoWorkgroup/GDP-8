@@ -1,12 +1,5 @@
+[MakeBuilder]
+Default Target=all
+
 [Project]
 VersionControlSupport=kdevgit
-
-[SourceFormatter]
-UseDefault=false
-text/x-c++hdr=kdevastyle||1TBS
-text/x-c++src=kdevastyle||1TBS
-text/x-chdr=kdevastyle||User1
-text/x-csharp=kdevastyle||1TBS
-text/x-csrc=kdevastyle||User1
-text/x-java=kdevastyle||1TBS
-text/x-objcsrc=kdevastyle||1TBS

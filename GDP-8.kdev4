@@ -1,4 +1,4 @@
 [Project]
-CreatedFrom=
-Manager=KDevCustomBuildSystem
+CreatedFrom=Makefile
+Manager=KDevCustomMakeManager
 Name=GDP-8

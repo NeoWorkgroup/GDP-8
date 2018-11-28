@@ -3,6 +3,8 @@
 || digital computer corpration, general data processor ||
 \* =================================================== */
 
+#pragma once
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
