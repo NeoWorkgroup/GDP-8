@@ -103,7 +103,7 @@ General Purpose Register Alias:
 	R02	C
 	R03	D
 	RF0~RFF	X0~XF
-	
+
 
 Instruction Formats:
 Zero Operand Instruction Format (Z):	(1 Byte)
@@ -163,7 +163,7 @@ LOAD / STORE Instruction Format (LS):	(6 Bytes)
 (IND:	Indexed)
 (INDEX:	Which register to use (X0 ~ XF))
 
-System Call (IO):	(4 Bytes)
+System Call (SYS):	(4 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 |             O   P             |           N   U   M           |           R   E   G           |           R   E   G           |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
