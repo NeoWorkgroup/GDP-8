@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <signal.h>
 
+#pragma once
+
 typedef uint8_t byte_t;
 typedef uint8_t bit_t;
 typedef uint64_t word_t;
@@ -75,7 +77,7 @@ enum InstructionList
 	RS=	0x76,
 	C=	0x80, /* And 0x81 */
 	CR=	0x82,
-	R=	0x83
+	R=	0x83,
 };
 
 #define OP_INSTS 55
@@ -181,9 +183,10 @@ struct CPU
 	memory_t *mem;
 };
 
-struct InterpretHandler
+struct Handler
 {
 	bit_t defined;
 	byte_t size;
-	void(*handler)(struct CPU *cpu, struct Instruction *inst);
+	void(*exec)(struct CPU *cpu, struct Instruction *inst);
+	void(*decode)(memory_t *memory, struct Instruction *inst);
 };

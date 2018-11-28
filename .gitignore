@@ -1,4 +1,5 @@
 gdp8*
+*.o
 a.out
 b.out
 coretest

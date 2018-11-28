@@ -11,3 +11,8 @@
 #include <unistd.h>
 #include <time.h>
 #include <libgdp8.h>
+
+int main(void)
+{
+	return 0;
+}

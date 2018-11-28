@@ -11,7 +11,7 @@ asm:	asm.o
 	$(CC) $(LDFLAGS) -o $(PROG_PREFIX)asm \
 		asm.o
 asm.o:
-	$(CC) $(LDFLAGS) -c $(PREFIX).c
+	$(CC) $(LDFLAGS) $(CFLAGS) -c $(.PREFIX).c
 
 clean:
 	-rm -fv asm *.o
