@@ -1,7 +1,7 @@
-/* ============================== *\
- *           G D P - 8            *
- * general data processor - eight *
-\* ============================== */
+/* =================================================== *\
+||                 D C C   G D P - 8                   ||
+|| digital computer corpration, general data processor ||
+\* =================================================== */
 
 #include <stdio.h>
 #include <stdlib.h>
