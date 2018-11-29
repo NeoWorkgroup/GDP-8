@@ -2,12 +2,12 @@ CC = clang
 CFLAGS=-O2 -g -pipe -Wall -Wextra -I./vm
 LDFLAGS=
 VMOBJS= vm/main.o vm/inst.o vm/insthandler.o vm/cpu.o
-all: $(VMOBJS) gdp8 assembler
-gdp8:
-	$(CC) $(CFLAGS) $(LDFLAGS) $(VMOBJS) -o gdp8
+all: gdp8 assembler
+gdp8: $(VMOBJS)
+	$(CC) $(LDFLAGS) $(VMOBJS) -o gdp8
 
-assembler:
-	$(CC) $(CFLAGS) $(LDFLAGS) asm/asm.c -o assembler
+assembler: asm/asm.o
+	$(CC) $(LDFLAGS) asm/asm.o -o assembler
 
 clean:
 	rm -rfv $(VMOBJS) gdp8 assembler
