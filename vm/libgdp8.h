@@ -161,14 +161,14 @@ struct arg_sys
 
 union arg_union
 {
-	struct arg_u	_u;
-	struct arg_d	_d;
-	struct arg_iq	_iq;
-	struct arg_iw	_iw;
-	struct arg_ls	_ls;
-	struct arg_jc	_jc;
-	struct arg_rjc	_rjc;
-	struct arg_io	_io;
+	struct arg_u	u;
+	struct arg_d	d;
+	struct arg_iq	iq;
+	struct arg_iw	iw;
+	struct arg_ls	ls;
+	struct arg_jc	jc;
+	struct arg_rjc	rjc;
+	struct arg_io	io;
 };
 
 struct Instruction

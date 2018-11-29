@@ -43,8 +43,11 @@ void cpu_init(struct CPU *cpu)
 void cpu_mainloop(struct CPU *cpu, addr_t address)
 {
 	int ret=0;
-	while(cpu->reg.pc < (1<<24))
+	cpu->reg.pc=address;
+	while(cpu->ireg.inst.op != HLT)
 	{
+		if(cpu->reg.pc >= (1<<24))
+			goto pc_too_large;
 		ret = fetch(cpu->mem + cpu->reg.pc, &(cpu->ireg.inst));
 		if(ret == EOF)
 			goto err;
@@ -53,6 +56,8 @@ void cpu_mainloop(struct CPU *cpu, addr_t address)
 		handler[cpu->ireg.inst.op].exec(cpu);
 	}
 	return;
+pc_too_large:
+	panic("?PC\n");
 err:
 	panic("?ILL\n");
 }
