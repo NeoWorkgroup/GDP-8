@@ -11,7 +11,13 @@
 #include <unistd.h>
 #include <signal.h>
 #include "libgdp8.h"
+#define DECODE_DEFINE(name) \
+	void op_ ## name ## _decode(memory_t *memory, struct Instruction *inst)
+#define EXEC_DEFINE(name) \
+	void op_ ## name ## _exec(struct CPU *cpu, struct Instruction *inst)
 
 struct Handler handler[256];
-void op_nop_exec(struct CPU *cpu, struct Instruction *inst);
-void op_nop_decode(memory_t *memory, struct Instruction *inst);
+DECODE_DEFINE(nop);
+EXEC_DEFINE(nop);
+DECODE_DEFINE(hlt);
+EXEC_DEFINE(hlt);

@@ -28,7 +28,7 @@ Instructions:
 	Memory Reference:
 	LD	LS (YES)	Load
 	ST	LS (YES)	Store
-	LI	IF (YES)	Load 16 Bit intermediate
+	LI	IQ (YES)	Load 16 Bit intermediate
 	LIW	IW (YES)	Load 64 Bit intermediate
 
 	Integer Arithmetic:
@@ -39,10 +39,10 @@ Instructions:
 	MUL	D (YES)		Multiply
 	DIV	D (YES)		Divide
 	MOD	D (YES)		Modulo
-	ADDI	IF (YES)	Add intermediate
-	SUBI	IF (YES)	Subtract intermediate
-	INCI	IF (YES)	Increment intermediate
-	DECI	IF (YES)	Decrement intermediate
+	ADDI	IQ (YES)	Add intermediate
+	SUBI	IQ (YES)	Subtract intermediate
+	INCI	IQ (YES)	Increment intermediate
+	DECI	IQ (YES)	Decrement intermediate
 
 	Bitwise Operation:
 	AND	D (YES)		And
@@ -61,6 +61,7 @@ Instructions:
 	Data Moving:
 	SWP	D (YES)		Swap content of register
 	MOV	D (YES)		Move %SRC to %DST
+	MOVC	D (YES)		Move %SRC to %DST and clear %SRC
 
 	Stack:
 	PUSH	U (YES)		Push
@@ -122,7 +123,7 @@ Two Operand (D):	(3 Bytes)
 |             O   P             |           D   S   T           |           S   R   C           |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-One and Quarter (IF):	(4 Bytes)
+One and Quarter (IQ):	(4 Bytes)
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 |             O   P             |           R   E   G           |                       V   A   L   U   E                       |
 +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+

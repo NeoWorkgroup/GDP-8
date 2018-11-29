@@ -11,12 +11,22 @@
 #include "libgdp8.h"
 #include "insthandler.h"
 
-void op_nop_exec(struct CPU *cpu, struct Instruction *inst)
+EXEC_DEFINE(nop)
 {
 	return;
 }
 
-void op_nop_decode(memory_t *memory, struct Instruction *inst)
+DECODE_DEFINE(nop)
 {
-	inst->op=*memory;
+	inst->op=NOP;
+}
+
+EXEC_DEFINE(hlt)
+{
+	panic("?HLT");
+}
+
+DECODE_DEFINE(hlt)
+{
+	inst->op=HLT;
 }
