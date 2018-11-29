@@ -30,3 +30,17 @@ DECODE_DEFINE(hlt)
 {
 	inst->op=HLT;
 }
+
+EXEC_DEFINE(io)
+{
+	iohandler[cpu->ireg.inst.arg._io.dev].exec(cpu);
+}
+
+DECODE_DEFINE(io)
+{
+	/* TODO: We need a better decoder and array bound checking */
+	inst->op=IO;
+	inst->arg._io.dev=	memory[1];
+	inst->arg._io.op=	memory[2];
+	inst->arg._io.reg=	memory[3];
+}

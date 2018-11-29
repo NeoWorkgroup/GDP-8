@@ -94,6 +94,13 @@ enum InstructionList
 
 #define OP_INSTS 55
 
+enum IODev
+{
+	CPU,
+	CONSOLE,
+	IODEV_NUM
+};
+
 struct arg_u
 {
 	reg_t reg;
@@ -200,8 +207,41 @@ struct Handler
 {
 	bit_t defined;
 	bit_t size;
-	void(*exec)(struct CPU *cpu, struct Instruction *inst);
+	void(*exec)(struct CPU *cpu);
 	void(*decode)(memory_t *memory, struct Instruction *inst);
+};
+
+struct IOHandler
+{
+	bit_t defined;
+	void(*exec)(struct CPU *cpu);
+};
+
+enum CPU_IO_OP
+{
+	CPU_IO_EI,
+	CPU_IO_DI,
+	CPU_IO_ECLK,
+	CPU_IO_DCLK,
+	CPU_IO_PSR,
+	CPU_IO_DPY,
+	CPU_IO_ABRT,
+	CPU_IO_CORE,
+	CPU_IO_GSP,
+	CPU_IO_GIV,
+	CPU_IO_SSP,
+	CPU_IO_GRP,
+	CPU_IO_SRP,
+	CPU_IO_GPC,
+	CPU_IO_GIPC
+};
+
+enum CONSOLE_IO_OP
+{
+	CONSOLE_IO_OUT,
+	CONSOLE_IO_IN,
+	CONSOLE_IO_BEL,
+	CONSOLE_IO_RST,
 };
 
 /* Global Functions */

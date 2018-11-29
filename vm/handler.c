@@ -13,6 +13,7 @@
 
 #define decode(name)	op_ ## name ## _decode
 #define exec(name)	op_ ## name ## _exec
+#define io(name)	io_ ## name
 
 struct Handler handler[256] =
 {
@@ -29,5 +30,26 @@ struct Handler handler[256] =
 		.size=		1,
 		.exec=		exec(hlt),
 		.decode=	decode(hlt)
+	},
+	[IO] =
+	{
+		.defined=	1,
+		.size=		4,
+		.exec=		exec(io),
+		.decode=	decode(io)
+	}
+};
+
+struct IOHandler iohandler[256] =
+{
+	[CPU] =
+	{
+		.defined=	1,
+		.exec=		io(cpu)
+	},
+	[CONSOLE] =
+	{
+		.defined=	1,
+		.exec=		io(console)
 	}
 };

@@ -50,7 +50,7 @@ void cpu_mainloop(struct CPU *cpu, addr_t address)
 			goto err;
 		else
 			cpu->reg.pc += ret;
-		handler[cpu->ireg.inst.op].exec(cpu, &(cpu->ireg.inst));
+		handler[cpu->ireg.inst.op].exec(cpu);
 	}
 	return;
 err:

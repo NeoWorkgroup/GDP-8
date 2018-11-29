@@ -8,6 +8,7 @@ Default Target=all
 VersionControlSupport=kdevgit
 
 [SourceFormatter]
+OverrideKateIndentation=true
 UseDefault=false
 text/x-c++hdr=kdevastyle||1TBS
 text/x-c++src=kdevastyle||1TBS
