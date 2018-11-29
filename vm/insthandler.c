@@ -23,7 +23,7 @@ DECODE_DEFINE(nop)
 
 EXEC_DEFINE(hlt)
 {
-	panic("?HLT");
+	panic("?HLT\n");
 }
 
 DECODE_DEFINE(hlt)

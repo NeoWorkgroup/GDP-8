@@ -29,6 +29,7 @@ IO_DEFINE(console)
 			fputc('\a', stdout);
 			break;
 		case CONSOLE_IO_RST:
-			fputs("\033)0", stdout);
+			fputs("\033)0\033[H\033[J", stdout);
+			break;
 	}
 }
