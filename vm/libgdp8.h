@@ -249,4 +249,5 @@ enum CONSOLE_IO_OP
 void panic(const char *msg);
 int fetch(memory_t *memory, struct Instruction *inst);
 void cpu_init(struct CPU *cpu);
+void cpu_destroy(struct CPU *cpu);
 void cpu_mainloop(struct CPU *cpu, addr_t address);
