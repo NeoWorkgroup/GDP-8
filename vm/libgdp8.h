@@ -193,6 +193,7 @@ struct InternalRegister
 	struct Instruction inst;
 	bit_t usermode;
 	bit_t interrupt;
+	bit_t halted;
 	word_t display;
 };
 

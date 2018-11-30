@@ -58,5 +58,6 @@ int main(int argc, char **argv)
 	cpu_init(&cpu);
 	read_core(corefile, &cpu, start_address);
 	cpu_mainloop(&cpu, start_address);
+	cpu_destroy(&cpu);
 	return 0;
 }

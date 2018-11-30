@@ -31,7 +31,7 @@ int fetch(memory_t *memory, struct Instruction *inst)
 
 void cpu_init(struct CPU *cpu)
 {
- 	memset(cpu, 0x00, sizeof(struct CPU));
+	memset(cpu, 0x00, sizeof(struct CPU));
 	/* Allocate memory */
 	if((cpu->mem = malloc(1 << 24)) == NULL)
 	{
@@ -40,11 +40,17 @@ void cpu_init(struct CPU *cpu)
 	}
 }
 
+void cpu_destroy(struct CPU *cpu)
+{
+	free(cpu->mem);
+	memset(cpu, 0x00, sizeof(struct CPU));
+}
+
 void cpu_mainloop(struct CPU *cpu, addr_t address)
 {
 	int ret=0;
 	cpu->reg.pc=address;
-	while(cpu->ireg.inst.op != HLT)
+	while(cpu->ireg.halted != 1)
 	{
 		if(cpu->reg.pc >= (1<<24))
 			goto pc_too_large;

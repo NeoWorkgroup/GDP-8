@@ -23,7 +23,7 @@ DECODE_DEFINE(nop)
 
 EXEC_DEFINE(hlt)
 {
-	panic("?HLT\n");
+	cpu->ireg.halted=1;
 }
 
 DECODE_DEFINE(hlt)
