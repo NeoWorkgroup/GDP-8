@@ -12,6 +12,12 @@
 #include "libgdp8.h"
 #include "insthandler.h"
 
+#ifdef __linux__
+#include <endian.h>
+#else
+#include <sys/endian.h>
+#endif
+
 void panic(const char *msg)
 {
 	fputs(msg, stderr);
@@ -33,21 +39,21 @@ addr_t getaddress(memory_t *memory)
 {
 	addr_t address=0;
 	memcpy(&address, memory, 3);
-	return address;
+	return le32toh(address);
 }
 
 word_t getword(memory_t *memory)
 {
 	word_t word=0;
 	memcpy(&word, memory, sizeof(word_t));
-	return word;
+	return le64toh(word);
 }
 
 quart_t getquarter(memory_t *memory)
 {
 	quart_t quarter=0;
 	memcpy(&quarter, memory, sizeof(quart_t));
-	return quarter;
+	return le16toh(quarter);
 }
 
 addr_t getrealaddr(struct CPU *cpu, addr_t address, bit_t indirect)
