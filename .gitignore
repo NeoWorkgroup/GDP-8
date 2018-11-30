@@ -1,5 +1,6 @@
 gdp8*
 assembler
+hex2bin
 *.o
 a.out
 .*.swp
