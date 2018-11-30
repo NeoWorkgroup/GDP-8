@@ -38,7 +38,6 @@ EXEC_DEFINE(io)
 
 DECODE_DEFINE(io)
 {
-	/* TODO: We need a better decoder and array bound checking */
 	inst->op=IO;
 	inst->arg.io.dev=	memory[1];
 	inst->arg.io.op=	memory[2];

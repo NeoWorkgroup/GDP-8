@@ -36,6 +36,19 @@ addr_t getaddress(memory_t *memory)
 	return address;
 }
 
+word_t getword(memory_t *memory)
+{
+	word_t word=0;
+	memcpy(&word, memory, sizeof(word_t));
+	return word;
+}
+
+quart_t getquarter(memory_t *memory)
+{
+	quart_t quarter=0;
+	memcpy(&quarter, memory, sizeof(quart_t));
+	return quarter;
+}
 
 addr_t getrealaddr(struct CPU *cpu, addr_t address, bit_t indirect)
 {

@@ -13,11 +13,29 @@
 
 IO_DEFINE(cpu)
 {
+	switch(INST(cpu).arg.io.op)
+	{
+		case CPU_IO_EI:
+			IREG(cpu).interrupt=1;
+			break;
+		case CPU_IO_DI:
+			IREG(cpu).interrupt=0;
+			break;
+		case CPU_IO_ECLK:
+		case CPU_IO_DCLK:
+			break;
+		case CPU_IO_PSR:
+			R(cpu, INST(cpu).arg.io.reg) = IREG(cpu).panelswitch;
+			break;
+		case CPU_IO_DPY:
+			IREG(cpu).display = R(cpu, INST(cpu).arg.io.reg);
+			break;
+	}
 }
 
 IO_DEFINE(console)
 {
-	switch(cpu->ireg.inst.arg.io.op)
+	switch(INST(cpu).arg.io.op)
 	{
 		case CONSOLE_IO_OUT:
 			fputc((int)(R(cpu, INST(cpu).arg.io.reg) & 0xFF), stdout);

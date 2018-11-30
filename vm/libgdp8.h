@@ -14,6 +14,7 @@
 typedef uint8_t byte_t;
 typedef uint8_t bit_t;
 typedef uint64_t word_t;
+typedef uint16_t quart_t;
 typedef uint32_t addr_t;
 typedef uint8_t reg_t;
 typedef int32_t offset_t;
@@ -195,6 +196,7 @@ struct InternalRegister
 	bit_t interrupt;
 	bit_t halted;
 	word_t display;
+	word_t panelswitch;
 };
 
 struct CPU
@@ -260,6 +262,8 @@ enum CONSOLE_IO_OP
 void panic(const char *msg);
 int fetch(memory_t *memory, struct Instruction *inst);
 addr_t getaddress(memory_t *memory);
+word_t getword(memory_t *memory);
+quart_t getquarter(memory_t *memory);
 addr_t getrealaddr(struct CPU *cpu, addr_t address, bit_t indirect);
 void cpu_init(struct CPU **cpu);
 void cpu_destroy(struct CPU **cpu);

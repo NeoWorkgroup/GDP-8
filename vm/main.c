@@ -13,11 +13,12 @@
 struct CPU *cpu;
 FILE	*corefile;
 addr_t	start_address=0;
+word_t	panel=0;
 
 void parsearg(int argc, char **argv)
 {
 	int opt=0;
-	while((opt = getopt(argc, argv, "hc:s:")) != EOF)
+	while((opt = getopt(argc, argv, "hc:s:p:")) != EOF)
 	{
 		switch(opt)
 		{
@@ -34,6 +35,9 @@ void parsearg(int argc, char **argv)
 				break;
 			case 's':
 				sscanf(optarg, "%x", &start_address);
+				break;
+			case 'p':
+				sscanf(optarg, "%lx", &panel);
 				break;
 			default:
 				panic("?ARG\n");
@@ -57,6 +61,7 @@ int main(int argc, char **argv)
 	parsearg(argc, argv);
 	cpu_init(&cpu);
 	read_core(corefile, cpu, start_address);
+	IREG(cpu).panelswitch=panel;
 	cpu_mainloop(cpu, start_address);
 	cpu_destroy(&cpu);
 	return 0;
