@@ -37,6 +37,20 @@ struct Handler handler[256] =
 		.size=		4,
 		.exec=		exec(io),
 		.decode=	decode(io)
+	},
+	[J] =
+	{
+		.defined=	1,
+		.size=		4,
+		.exec=		exec(j),
+		.decode=	decode(j)
+	},
+	[JI] =
+	{
+		.defined=	1,
+		.size=		4,
+		.exec=		exec(j),
+		.decode=	decode(j)
 	}
 };
 

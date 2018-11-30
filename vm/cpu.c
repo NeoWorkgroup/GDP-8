@@ -29,37 +29,55 @@ int fetch(memory_t *memory, struct Instruction *inst)
 	return handler[opcode].size;
 }
 
-void cpu_init(struct CPU *cpu)
+addr_t getaddress(memory_t *memory)
 {
-	memset(cpu, 0x00, sizeof(struct CPU));
+	addr_t address=0;
+	memcpy(&address, memory, 3);
+	return address;
+}
+
+
+addr_t getrealaddr(struct CPU *cpu, addr_t address, bit_t indirect)
+{
+	addr_t dest=0;
+	if(indirect)
+		dest=getaddress(MEM(cpu) + address);
+	else
+		dest=address;
+	return dest;
+}
+
+void cpu_init(struct CPU **cpu)
+{
+	*cpu = calloc(1, sizeof(struct CPU));
 	/* Allocate memory */
-	if((cpu->mem = malloc(1 << 24)) == NULL)
+	if((MEM(*cpu) = malloc(1 << 24)) == NULL)
 	{
 		perror("?MEM");
 		exit(8);
 	}
 }
 
-void cpu_destroy(struct CPU *cpu)
+void cpu_destroy(struct CPU **cpu)
 {
-	free(cpu->mem);
-	memset(cpu, 0x00, sizeof(struct CPU));
+	free(MEM(*cpu));
+	free(*cpu);
 }
 
 void cpu_mainloop(struct CPU *cpu, addr_t address)
 {
 	int ret=0;
-	cpu->reg.pc=address;
-	while(cpu->ireg.halted != 1)
+	PC(cpu)=address;
+	while(IREG(cpu).halted != 1)
 	{
 		if(cpu->reg.pc >= (1<<24))
 			goto pc_too_large;
-		ret = fetch(cpu->mem + cpu->reg.pc, &(cpu->ireg.inst));
+		ret = fetch(MEM(cpu) + PC(cpu), &INST(cpu));
 		if(ret == EOF)
 			goto err;
 		else
-			cpu->reg.pc += ret;
-		handler[cpu->ireg.inst.op].exec(cpu);
+			PC(cpu) += ret;
+		handler[INST_OP(cpu)].exec(cpu);
 	}
 	return;
 pc_too_large:

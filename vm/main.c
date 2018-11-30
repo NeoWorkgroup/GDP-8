@@ -10,7 +10,7 @@
 #include <signal.h>
 #include "libgdp8.h"
 
-struct CPU cpu;
+struct CPU *cpu;
 FILE	*corefile;
 addr_t	start_address=0;
 
@@ -56,8 +56,8 @@ int main(int argc, char **argv)
 {
 	parsearg(argc, argv);
 	cpu_init(&cpu);
-	read_core(corefile, &cpu, start_address);
-	cpu_mainloop(&cpu, start_address);
+	read_core(corefile, cpu, start_address);
+	cpu_mainloop(cpu, start_address);
 	cpu_destroy(&cpu);
 	return 0;
 }

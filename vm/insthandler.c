@@ -23,7 +23,7 @@ DECODE_DEFINE(nop)
 
 EXEC_DEFINE(hlt)
 {
-	cpu->ireg.halted=1;
+	IREG(cpu).halted=1;
 }
 
 DECODE_DEFINE(hlt)
@@ -33,7 +33,7 @@ DECODE_DEFINE(hlt)
 
 EXEC_DEFINE(io)
 {
-	iohandler[cpu->ireg.inst.arg.io.dev].exec(cpu);
+	iohandler[INST(cpu).arg.io.dev].exec(cpu);
 }
 
 DECODE_DEFINE(io)
@@ -43,4 +43,19 @@ DECODE_DEFINE(io)
 	inst->arg.io.dev=	memory[1];
 	inst->arg.io.op=	memory[2];
 	inst->arg.io.reg=	memory[3];
+}
+
+DECODE_DEFINE(j)
+{
+	inst->op=J;
+	inst->arg.jc.address=getaddress(memory + 1);
+	if(memory[0] & 0x01) /* Indirect */
+		inst->arg.jc.indirect=1;
+	else
+		inst->arg.jc.indirect=0;
+}
+
+EXEC_DEFINE(j)
+{
+	PC(cpu) = getrealaddr(cpu, INST(cpu).arg.jc.address, INST(cpu).arg.jc.indirect);
 }

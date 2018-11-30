@@ -20,10 +20,10 @@ IO_DEFINE(console)
 	switch(cpu->ireg.inst.arg.io.op)
 	{
 		case CONSOLE_IO_OUT:
-			fputc((int)(cpu->reg.r[cpu->ireg.inst.arg.io.reg] & 0xFF), stdout);
+			fputc((int)(R(cpu, INST(cpu).arg.io.reg) & 0xFF), stdout);
 			break;
 		case CONSOLE_IO_IN:
-			cpu->reg.r[cpu->ireg.inst.arg.io.reg]=(word_t)fgetc(stdin);
+			R(cpu, INST(cpu).arg.io.reg)=(word_t)fgetc(stdin);
 			break;
 		case CONSOLE_IO_BEL:
 			fputc('\a', stdout);

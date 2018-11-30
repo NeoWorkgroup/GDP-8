@@ -245,9 +245,22 @@ enum CONSOLE_IO_OP
 	CONSOLE_IO_RST,
 };
 
+/* Useful Macros */
+#define MEM(name)	((name)->mem)
+#define INST(name)	((name)->ireg.inst)
+#define INST_OP(name)	((name)->ireg.inst.op)
+#define REG(name)	((name)->reg)
+#define IREG(name)	((name)->ireg)
+#define PC(name)	((name)->reg.pc)
+#define R(name, num)	((name)->reg.r[(num)])
+#define IPC(name)	((name)->reg.ipc)
+#define IV(name)	((name)->reg.iv)
+
 /* Global Functions */
 void panic(const char *msg);
 int fetch(memory_t *memory, struct Instruction *inst);
-void cpu_init(struct CPU *cpu);
-void cpu_destroy(struct CPU *cpu);
+addr_t getaddress(memory_t *memory);
+addr_t getrealaddr(struct CPU *cpu, addr_t address, bit_t indirect);
+void cpu_init(struct CPU **cpu);
+void cpu_destroy(struct CPU **cpu);
 void cpu_mainloop(struct CPU *cpu, addr_t address);
