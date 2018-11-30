@@ -42,9 +42,13 @@ void parsearg(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+	int ret=0;
 	corefile=stdin;
 	parsearg(argc, argv);
-	while(fscanf(corefile, "%2x", &input) != EOF)
-		fputc((char)input, stdout);
+	while((ret = fscanf(corefile, "%2x", &input)) != EOF)
+	{
+		if(ret != 0)
+			fputc((char)input, stdout);
+	}
 	return 0;
 }
