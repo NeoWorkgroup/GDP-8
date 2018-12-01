@@ -131,6 +131,7 @@ struct arg_ls
 	reg_t index;
 	bit_t indirect;
 	bit_t size;
+	addr_t address;
 };
 
 struct arg_jc
