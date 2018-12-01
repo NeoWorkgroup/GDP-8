@@ -127,6 +127,7 @@ struct arg_iw
 
 struct arg_ls
 {
+	reg_t reg;
 	bit_t ind;
 	reg_t index;
 	bit_t indirect;
