@@ -31,12 +31,26 @@ struct Handler handler[256] =
 		.exec=		execute(hlt),
 		.decode=	decode(hlt)
 	},
+	[INT] =
+	{
+		.defined=	1,
+		.size=		2,
+		.exec=		execute(int),
+		.decode=	decode(int)
+	},
 	[IO] =
 	{
 		.defined=	1,
 		.size=		4,
 		.exec=		execute(io),
 		.decode=	decode(io)
+	},
+	[IRET] =
+	{
+		.defined=	1,
+		.size=		1,
+		.exec=		execute(iret),
+		.decode=	decode(iret)
 	},
 	[J] =
 	{

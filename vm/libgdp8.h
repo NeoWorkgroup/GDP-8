@@ -195,6 +195,7 @@ struct InternalRegister
 {
 	struct Instruction inst;
 	bit_t usermode;
+	bit_t iusermode;
 	bit_t interrupt;
 	bit_t halted;
 	word_t display;
@@ -247,6 +248,14 @@ enum CONSOLE_IO_OP
 	CONSOLE_IO_IN,
 	CONSOLE_IO_BEL,
 	CONSOLE_IO_RST,
+};
+
+enum CPU_INTERRUPT
+{
+	NO_INTERRUPT,
+	TRIGGERED_INTERRUPT,
+	ONINTERRUPT,
+	INTERRUPT_DISABLED
 };
 
 /* Useful Macros */

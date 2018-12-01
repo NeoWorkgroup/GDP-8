@@ -135,6 +135,11 @@ void cpu_mainloop(struct CPU *cpu, addr_t address)
 		else
 			PC(cpu) += ret;
 		handler[INST(cpu).op].exec(cpu);
+		if(IREG(cpu).interrupt == TRIGGERED_INTERRUPT)
+		{
+			IREG(cpu).interrupt=ONINTERRUPT;
+			PC(cpu) = 0xF00000 + (REG(cpu).iv << 4);
+		}
 	}
 	return;
 pc_too_large:

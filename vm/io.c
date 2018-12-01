@@ -16,10 +16,10 @@ IO_DEFINE(cpu)
 	switch(INST(cpu).arg.io.op)
 	{
 		case CPU_IO_EI:
-			IREG(cpu).interrupt=1;
+			IREG(cpu).interrupt=NO_INTERRUPT;
 			break;
 		case CPU_IO_DI:
-			IREG(cpu).interrupt=0;
+			IREG(cpu).interrupt=INTERRUPT_DISABLED;
 			break;
 		case CPU_IO_ECLK:
 		case CPU_IO_DCLK:

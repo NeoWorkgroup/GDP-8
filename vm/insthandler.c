@@ -11,19 +11,14 @@
 #include "libgdp8.h"
 #include "insthandler.h"
 
-EXEC_DEFINE(nop)
-{
-	return;
-}
-
 DECODE_DEFINE(nop)
 {
 	inst->op = NOP;
 }
 
-EXEC_DEFINE(hlt)
+EXEC_DEFINE(nop)
 {
-	IREG(cpu).halted=1;
+	return;
 }
 
 DECODE_DEFINE(hlt)
@@ -31,9 +26,9 @@ DECODE_DEFINE(hlt)
 	inst->op = HLT;
 }
 
-EXEC_DEFINE(io)
+EXEC_DEFINE(hlt)
 {
-	iohandler[INST(cpu).arg.io.dev].exec(cpu);
+	IREG(cpu).halted=1;
 }
 
 DECODE_DEFINE(io)
@@ -42,6 +37,23 @@ DECODE_DEFINE(io)
 	inst->arg.io.dev =	getbyte(memory + 1);
 	inst->arg.io.op =	getbyte(memory + 2);
 	inst->arg.io.reg =	getbyte(memory + 3);
+}
+
+EXEC_DEFINE(io)
+{
+	iohandler[INST(cpu).arg.io.dev].exec(cpu);
+}
+
+DECODE_DEFINE(iret)
+{
+	inst->op = IRET;
+}
+
+EXEC_DEFINE(iret)
+{
+	PC(cpu) = REG(cpu).ipc;
+	IREG(cpu).usermode = IREG(cpu).iusermode;
+	IREG(cpu).interrupt = NO_INTERRUPT;
 }
 
 DECODE_DEFINE(j)
@@ -173,4 +185,20 @@ DECODE_DEFINE(inc)
 EXEC_DEFINE(inc)
 {
 	R(cpu, INST(cpu).arg.u.reg)++;
+}
+
+DECODE_DEFINE(int)
+{
+	inst->op = INT;
+	inst->arg.u.reg = getbyte(memory + 1); /* Actually not register */
+}
+
+EXEC_DEFINE(int)
+{
+	if(IREG(cpu).interrupt == INTERRUPT_DISABLED)
+		panic("?INTDISABLE");
+	REG(cpu).iv = INST(cpu).arg.u.reg;
+	REG(cpu).ipc = PC(cpu);
+	IREG(cpu).iusermode = IREG(cpu).usermode;
+	IREG(cpu).interrupt=TRIGGERED_INTERRUPT;
 }
