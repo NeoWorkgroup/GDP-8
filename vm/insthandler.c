@@ -163,3 +163,14 @@ EXEC_DEFINE(li)
 {
 	R(cpu, INST(cpu).arg.iq.reg) = INST(cpu).arg.iq.value;
 }
+
+DECODE_DEFINE(inc)
+{
+	inst->op = INC;
+	inst->arg.u.reg = getbyte(memory + 1);
+}
+
+EXEC_DEFINE(inc)
+{
+	R(cpu, INST(cpu).arg.u.reg)++;
+}

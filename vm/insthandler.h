@@ -32,5 +32,6 @@ INST_DEFINE(j);
 INST_DEFINE(ld);
 INST_DEFINE(st);
 INST_DEFINE(li);
+INST_DEFINE(inc);
 IO_DEFINE(cpu);
 IO_DEFINE(console);

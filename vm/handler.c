@@ -72,6 +72,13 @@ struct Handler handler[256] =
 		.size=		4,
 		.exec=		execute(li),
 		.decode=	decode(li)
+	},
+	[INC] =
+	{
+		.defined=	1,
+		.size=		2,
+		.exec=		execute(inc),
+		.decode=	decode(inc)
 	}
 };
 
