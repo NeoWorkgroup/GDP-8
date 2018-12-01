@@ -59,10 +59,10 @@ void read_core(FILE *fp, struct CPU *cpu, addr_t start_address)
 int main(int argc, char **argv)
 {
 	parsearg(argc, argv);
-	cpu_init(&cpu);
+	cpu = cpu_init();
 	read_core(corefile, cpu, start_address);
 	IREG(cpu).panelswitch=panel;
 	cpu_mainloop(cpu, start_address);
-	cpu_destroy(&cpu);
+	cpu_destroy(cpu);
 	return 0;
 }

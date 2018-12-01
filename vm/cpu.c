@@ -66,21 +66,22 @@ addr_t getrealaddr(struct CPU *cpu, addr_t address, bit_t indirect)
 	return dest;
 }
 
-void cpu_init(struct CPU **cpu)
+struct CPU *cpu_init(void)
 {
-	*cpu = calloc(1, sizeof(struct CPU));
+	struct CPU *cpu = calloc(1, sizeof(struct CPU));
 	/* Allocate memory */
-	if((MEM(*cpu) = malloc(1 << 24)) == NULL)
+	if((MEM(cpu) = malloc(1 << 24)) == NULL)
 	{
 		perror("?MEM");
 		exit(8);
 	}
+	return cpu;
 }
 
-void cpu_destroy(struct CPU **cpu)
+void cpu_destroy(struct CPU *cpu)
 {
-	free(MEM(*cpu));
-	free(*cpu);
+	free(MEM(cpu));
+	free(cpu);
 }
 
 void cpu_mainloop(struct CPU *cpu, addr_t address)

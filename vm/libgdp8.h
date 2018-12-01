@@ -265,6 +265,6 @@ addr_t getaddress(memory_t *memory);
 word_t getword(memory_t *memory);
 quart_t getquarter(memory_t *memory);
 addr_t getrealaddr(struct CPU *cpu, addr_t address, bit_t indirect);
-void cpu_init(struct CPU **cpu);
-void cpu_destroy(struct CPU **cpu);
+struct CPU *cpu_init(void);
+void cpu_destroy(struct CPU *cpu);
 void cpu_mainloop(struct CPU *cpu, addr_t address);
