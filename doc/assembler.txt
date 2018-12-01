@@ -3,9 +3,9 @@
 ; This is a simple comment
 ; All symbol is limited to 63 character long
 
-A==R00
-B==R01
-.ADDR	100	; Starting Address (Hex)
+.DEF	A	R00		; Define
+.DEF	B	R01
+.ADDR	100			; Starting Address (Hex)
 START:	CLR
 	LOAD	W, %A, TEMP	; Normal
 	LOAD	W, %A, TEMP:%B	; Indexed
