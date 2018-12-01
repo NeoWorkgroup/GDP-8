@@ -7,8 +7,8 @@ A==R00
 B==R01
 .ADDR	100	; Starting Address (Hex)
 START:	CLR
-	LOAD	L, %A, TEMP	; Normal
-	LOAD	L, %A, TEMP:%B	; Indexed
+	LOAD	W, %A, TEMP	; Normal
+	LOAD	W, %A, TEMP:%B	; Indexed
 	LI	%A, #0		; Intermediate
 	HLT
 COUNT:	CLR			; Clear all flag

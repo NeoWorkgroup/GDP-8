@@ -56,9 +56,34 @@ quart_t getquarter(memory_t *memory)
 	return le16toh(quarter);
 }
 
+byte_t getbyte(memory_t *memory)
+{
+	byte_t byte;
+	memcpy(&byte, memory, sizeof(byte_t));
+	return byte;
+}
+
+void putword(memory_t *memory, word_t word)
+{
+	word_t target = htole64(word);
+	memcpy(memory, &target, 8);
+}
+
+void putaddress(memory_t *memory, addr_t address)
+{
+	addr_t target = htole32(address & ADDRMASK);
+	memcpy(memory, &target, 3);
+}
+
+void putbyte(memory_t *memory, byte_t byte)
+{
+	memcpy(memory, &byte, sizeof(byte_t));
+}
+
 addr_t getrealaddr(struct CPU *cpu, addr_t address, bit_t indirect)
 {
 	addr_t dest=0;
+	address &= (1<<24) - 1;
 	if(indirect)
 		dest=getaddress(MEM(cpu) + address);
 	else
@@ -102,7 +127,7 @@ void cpu_mainloop(struct CPU *cpu, addr_t address)
 	PC(cpu)=address;
 	while(IREG(cpu).halted != 1)
 	{
-		if(cpu->reg.pc >= (1<<24))
+		if(cpu->reg.pc > ADDRMASK)
 			goto pc_too_large;
 		ret = fetch(MEM(cpu) + PC(cpu), &INST(cpu));
 		if(ret == EOF)

@@ -12,7 +12,7 @@
 #include "insthandler.h"
 
 #define decode(name)	op_ ## name ## _decode
-#define exec(name)	op_ ## name ## _exec
+#define execute(name)	op_ ## name ## _exec
 #define io(name)	io_ ## name
 
 struct Handler handler[256] =
@@ -21,36 +21,57 @@ struct Handler handler[256] =
 	{
 		.defined=	1,
 		.size=		1,
-		.exec=		exec(nop),
+		.exec=		execute(nop),
 		.decode=	decode(nop)
 	},
 	[HLT] =
 	{
 		.defined=	1,
 		.size=		1,
-		.exec=		exec(hlt),
+		.exec=		execute(hlt),
 		.decode=	decode(hlt)
 	},
 	[IO] =
 	{
 		.defined=	1,
 		.size=		4,
-		.exec=		exec(io),
+		.exec=		execute(io),
 		.decode=	decode(io)
 	},
 	[J] =
 	{
 		.defined=	1,
 		.size=		4,
-		.exec=		exec(j),
+		.exec=		execute(j),
 		.decode=	decode(j)
 	},
 	[JI] =
 	{
 		.defined=	1,
 		.size=		4,
-		.exec=		exec(j),
+		.exec=		execute(j),
 		.decode=	decode(j)
+	},
+	[LD] =
+	{
+		.defined=	1,
+		.size=		6,
+		.exec=		execute(ld),
+		.decode=	decode(ld)
+	},
+	[ST] =
+	{
+		.defined=	1,
+		.size=		6,
+		.exec=		execute(st),
+		.decode=	decode(st)
+	},
+	[LI] =
+	{
+		.defined=	1,
+		.size=		4,
+		.exec=		execute(li),
+		.decode=	decode(li)
 	}
 };
 

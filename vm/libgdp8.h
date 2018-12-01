@@ -257,12 +257,18 @@ enum CONSOLE_IO_OP
 #define PC(name)	((name)->reg.pc)
 #define R(name, num)	((name)->reg.r[(num)])
 
+#define ADDRMASK	((1 << 24) - 1)
+
 /* Global Functions */
 void panic(const char *msg);
 int fetch(memory_t *memory, struct Instruction *inst);
 addr_t getaddress(memory_t *memory);
 word_t getword(memory_t *memory);
 quart_t getquarter(memory_t *memory);
+byte_t getbyte(memory_t *memory);
+void putword(memory_t *memory, word_t word);
+void putaddress(memory_t *memory, addr_t address);
+void putbyte(memory_t *memory, byte_t byte);
 addr_t getrealaddr(struct CPU *cpu, addr_t address, bit_t indirect);
 struct CPU *cpu_init(void);
 struct CPU *cpu_add(struct CPU *mastercpu);
