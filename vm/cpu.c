@@ -78,9 +78,21 @@ struct CPU *cpu_init(void)
 	return cpu;
 }
 
+struct CPU *cpu_add(struct CPU *mastercpu)
+{
+	struct CPU *cpu = calloc(1, sizeof(struct CPU));
+	MEM(cpu) = MEM(mastercpu);
+	return cpu;
+}
+
 void cpu_destroy(struct CPU *cpu)
 {
 	free(MEM(cpu));
+	free(cpu);
+}
+
+void cpu_remove(struct CPU *cpu)
+{
 	free(cpu);
 }
 
@@ -97,7 +109,7 @@ void cpu_mainloop(struct CPU *cpu, addr_t address)
 			goto err;
 		else
 			PC(cpu) += ret;
-		handler[INST_OP(cpu)].exec(cpu);
+		handler[INST(cpu).op].exec(cpu);
 	}
 	return;
 pc_too_large:
