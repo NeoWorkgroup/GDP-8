@@ -32,14 +32,13 @@ BLANKSPACE	[ \t]+
 {REGISTER}	printf("REGISTER:\t%s\t", yytext);
 {WORD}		printf("WORD:\t%s\t", yytext);
 {INDIRECT}	printf("INDIRECT:\t%s\t", yytext);
-
 {PSEUDOOP}	printf("PSEUDOOP:\t%s\t", yytext);
 {COMMENT}	printf("\nCOMMENT:\t%s", yytext);
+{QUOTE}		printf("QUOTE:\t%s\t", yytext);
 ","		printf(",\t");
 \n		putchar('\n');
-\".*\"		printf("QUOTE:\t%s\t", yytext);
-.		printf("NOPE:\t%s\t", yytext);
 {BLANKSPACE}	;
+.		printf("NOPE:\t%s\t", yytext);
 
 %%
 

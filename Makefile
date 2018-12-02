@@ -13,7 +13,7 @@ assembler: asm/asm.o
 	$(CC) $(LDFLAGS) asm/asm.o -o assembler
 
 asm/lex.yy.c:
-	$(LEX) -o asm/lex.yy.c asm/asm.l
+	$(LEX) -o asm/lex.yy.c asm/gdp8.l
 
 asmlex: asm/lex.yy.c
 	$(CC) $(CFLAGS) asm/lex.yy.c -o asmlex -ll
