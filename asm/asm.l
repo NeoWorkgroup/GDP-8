@@ -11,9 +11,9 @@
 #include <signal.h>
 %}
 
-WORD	[a-zA-Z][0-9a-zA-Z]*
-VALUE	[0-9a-fA-F]+
-ADDR	"$"{VALUE}
+WORD		[a-zA-Z][0-9a-zA-Z]*
+VALUE		[0-9a-fA-F]+
+ADDR		"$"({VALUE}|{WORD})
 INTERMEDIATE	"#"{VALUE}
 RELATIVE	[\+\-]{VALUE}
 REGISTER	"%"({VALUE}|{WORD})
@@ -21,6 +21,7 @@ INDIRECT	"@"{WORD}
 PSEUDOOP	"."{WORD}
 COMMENT		";".*\n
 QUOTE		\".*\"
+BLANKSPACE	[ \t]+
 
 %%
 
@@ -38,7 +39,7 @@ QUOTE		\".*\"
 \n		putchar('\n');
 \".*\"		printf("QUOTE:\t%s\t", yytext);
 .		printf("NOPE:\t%s\t", yytext);
-[ \t]+		;
+{BLANKSPACE}	;
 
 %%
 
