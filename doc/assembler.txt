@@ -5,7 +5,7 @@
 
 .DEF	A	R00		; Define
 .DEF	B	R01
-.ADDR	100			; Starting Address (Hex)
+.ADDR	$100			; Starting Address (Hex)
 START:	CLR
 	LOAD	W, %A, TEMP	; Normal
 	LOAD	W, %A, TEMP:%B	; Indexed
@@ -19,7 +19,7 @@ COUNT:	CLR			; Clear all flag
 	J	@NOPE		; @ means indirect access
 	JR	X, @NOPE	; Same effect as above
 
-TEMP:	.WORD	0		; Note that constants are in hexdecimal, not octal
+TEMP:	.WORD	$0		; Note that constants are in hexdecimal, not octal
 HW:	.ASCII	"WOW\n"		; ASCII Encoded Text
-ABYTE:	.BYTE	0xFF		; One byte
+ABYTE:	.BYTE	$FF		; One byte
 NOPE:	.ADDR	START		; Contains 3-byte address
