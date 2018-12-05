@@ -98,11 +98,11 @@ Registers:
 	IPC	(24 Bit):	Saved PC from Interrupt
 
 General Purpose Register Alias:
-	Name:	Alias
-	R00	A
-	R01	B
-	R02	C
-	R03	D
+	Name:	ALIAS:	DESCRIPTION:
+	R00	A	Accumulator
+	R01	B	Register B
+	R02	C	Counter
+	R03	D	Data
 	RF0~RFF	X0~XF
 
 
