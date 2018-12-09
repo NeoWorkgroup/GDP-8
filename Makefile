@@ -1,5 +1,6 @@
-CC=	clang
-CFLAGS=	-O2 -g -pipe -Wall -Wextra -I./vm
+CC=	cc
+WFLAGS=	-Wno-unused-parameter
+CFLAGS=	-O2 -g -pipe -Wall -Wextra -pedantic -I./vm $(WFLAGS)
 LDFLAGS=
 LEX=	lex
 VMOBJS= vm/main.o vm/handler.o vm/insthandler.o vm/cpu.o vm/io.o
@@ -12,11 +13,8 @@ gdp8: $(VMOBJS)
 assembler: asm/asm.o
 	$(CC) $(LDFLAGS) asm/asm.o -o assembler
 
-asm/lex.yy.c:
-	$(LEX) -o asm/lex.yy.c asm/gdp8.l
-
-asmlex: asm/lex.yy.c
-	$(CC) $(CFLAGS) asm/lex.yy.c -o asmlex -ll
+asmlex: asm/gdp8.c
+	$(CC) $(CFLAGS) asm/gdp8.c -o asmlex -ll
 
 hex2bin: asm/hex2bin.o
 	$(CC) $(LDFLAGS) asm/hex2bin.o -o hex2bin

@@ -2,7 +2,7 @@ gdp8
 assembler
 hex2bin
 asmlex
-lex.yy.c
+asm/gdp8.c
 *.o
 a.out
 .*.swp
