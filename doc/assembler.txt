@@ -12,14 +12,14 @@ START:	CLR
 	LI	%A, #0		; Intermediate
 	HLT
 COUNT:	CLR			; Clear all flag
-	INC	%A		; Increment, if result is 0, set Z flag
+LOOP:	INC	%A		; Increment, if result is 0, set Z flag
 	IO	CPU, DPY, %A	; Display data
-	JR	Z, +2		; Relative condition jump (signed integer)
-	JR	X, -2		; Unconditionally relative jump
-	J	@NOPE		; @ means indirect access
+	JR	Z, $CONT	; Relative condition jump (signed integer)
+	JR	X, $LOOP	; Unconditionally relative jump
+CONT:	J	@NOPE		; @ means indirect access
 	JR	X, @NOPE	; Same effect as above
 
-TEMP:	.WORD	$0		; Note that constants are in hexdecimal, not octal
+TEMP:	.WORD	#0		; Note that constants are in hexdecimal, not octal
 HW:	.ASCII	"WOW\n"		; ASCII Encoded Text
-ABYTE:	.BYTE	$FF		; One byte
+ABYTE:	.BYTE	#FF		; One byte
 NOPE:	.ADDR	START		; Contains 3-byte address
