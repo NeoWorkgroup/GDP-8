@@ -5,7 +5,7 @@
 
 .DEF	A	R00		; Define
 .DEF	X0	RF0
-.ADDR	$100			; Starting Address (Hex)
+.ORG	$100			; Starting Address (Hex)
 START:	CLR
 	LOAD	W, %A, TEMP	; Normal
 	LOAD	W, %A, TEMP:%X0	; Indexed
