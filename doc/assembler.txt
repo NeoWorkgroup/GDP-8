@@ -4,11 +4,11 @@
 ; All symbol is limited to 63 character long
 
 .DEF	A	R00		; Define
-.DEF	B	R01
+.DEF	X0	RF0
 .ADDR	$100			; Starting Address (Hex)
 START:	CLR
 	LOAD	W, %A, TEMP	; Normal
-	LOAD	W, %A, TEMP:%B	; Indexed
+	LOAD	W, %A, TEMP:%X0	; Indexed
 	LI	%A, #0		; Intermediate
 	HLT
 COUNT:	CLR			; Clear all flag
@@ -21,5 +21,5 @@ CONT:	J	@NOPE		; @ means indirect access
 
 TEMP:	.WORD	#0		; Note that constants are in hexdecimal, not octal
 HW:	.ASCII	"WOW\n"		; ASCII Encoded Text
-ABYTE:	.BYTE	#FF		; One byte
+BYTE:	.BYTE	#FF		; One byte
 NOPE:	.ADDR	START		; Contains 3-byte address
