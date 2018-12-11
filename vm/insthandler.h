@@ -17,8 +17,8 @@
 	void op_ ## name ## _exec(struct CPU *cpu)
 
 #define INST_DEFINE(name) \
-	void op_ ## name ## _decode(memory_t *memory, struct Instruction *inst); \
-	void op_ ## name ## _exec(struct CPU *cpu)
+	DECODE_DEFINE(name); \
+	EXEC_DEFINE(name)
 
 #define IO_DEFINE(name) \
 	void io_ ## name(struct CPU *cpu)
