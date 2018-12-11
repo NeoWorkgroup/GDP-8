@@ -187,6 +187,17 @@ EXEC_DEFINE(inc)
 	R(cpu, INST(cpu).arg.u.reg)++;
 }
 
+DECODE_DEFINE(dec)
+{
+	inst->op = DEC;
+	inst->arg.u.reg = getbyte(memory + 1);
+}
+
+EXEC_DEFINE(dec)
+{
+	R(cpu, INST(cpu).arg.u.reg)--;
+}
+
 DECODE_DEFINE(int)
 {
 	inst->op = INT;
@@ -197,6 +208,8 @@ EXEC_DEFINE(int)
 {
 	if(IREG(cpu).interrupt == INTERRUPT_DISABLED)
 		panic("?INTDISABLE");
+	if(IREG(cpu).usermode && INST(cpu).arg.u.reg != 0x80)
+		panic("?INTUM");
 	REG(cpu).iv = INST(cpu).arg.u.reg;
 	REG(cpu).ipc = PC(cpu);
 	IREG(cpu).iusermode = IREG(cpu).usermode;

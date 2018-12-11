@@ -15,97 +15,40 @@
 #define execute(name)	op_ ## name ## _exec
 #define io(name)	io_ ## name
 
+#define handler_add(name, op, instsize)		\
+	[op] =					\
+	{					\
+		.defined=	1,		\
+		.size=		instsize,	\
+		.exec=		execute(name),	\
+		.decode=	decode(name)	\
+	}
+
+#define io_add(name, dev)			\
+	[dev] =					\
+	{					\
+		.defined=	1,		\
+		.exec=		io(name)	\
+	}
+
 struct Handler handler[256] =
 {
-	[NOP] =
-	{
-		.defined=	1,
-		.size=		1,
-		.exec=		execute(nop),
-		.decode=	decode(nop)
-	},
-	[HLT] =
-	{
-		.defined=	1,
-		.size=		1,
-		.exec=		execute(hlt),
-		.decode=	decode(hlt)
-	},
-	[INT] =
-	{
-		.defined=	1,
-		.size=		2,
-		.exec=		execute(int),
-		.decode=	decode(int)
-	},
-	[IO] =
-	{
-		.defined=	1,
-		.size=		4,
-		.exec=		execute(io),
-		.decode=	decode(io)
-	},
-	[IRET] =
-	{
-		.defined=	1,
-		.size=		1,
-		.exec=		execute(iret),
-		.decode=	decode(iret)
-	},
-	[J] =
-	{
-		.defined=	1,
-		.size=		4,
-		.exec=		execute(j),
-		.decode=	decode(j)
-	},
-	[JI] =
-	{
-		.defined=	1,
-		.size=		4,
-		.exec=		execute(j),
-		.decode=	decode(j)
-	},
-	[LD] =
-	{
-		.defined=	1,
-		.size=		6,
-		.exec=		execute(ld),
-		.decode=	decode(ld)
-	},
-	[ST] =
-	{
-		.defined=	1,
-		.size=		6,
-		.exec=		execute(st),
-		.decode=	decode(st)
-	},
-	[LI] =
-	{
-		.defined=	1,
-		.size=		4,
-		.exec=		execute(li),
-		.decode=	decode(li)
-	},
-	[INC] =
-	{
-		.defined=	1,
-		.size=		2,
-		.exec=		execute(inc),
-		.decode=	decode(inc)
-	}
+	handler_add(nop, NOP, 1),
+	handler_add(hlt, HLT, 1),
+	handler_add(int, INT, 2),
+	handler_add(io, IO, 4),
+	handler_add(iret, IRET, 1),
+	handler_add(j, J, 4),
+	handler_add(j, JI, 4),
+	handler_add(ld, LD, 6),
+	handler_add(st, ST, 6),
+	handler_add(li, LI, 4),
+	handler_add(inc, INC, 2),
+	handler_add(dec, DEC, 2)
 };
 
 struct IOHandler iohandler[256] =
 {
-	[CPU] =
-	{
-		.defined=	1,
-		.exec=		io(cpu)
-	},
-	[CONSOLE] =
-	{
-		.defined=	1,
-		.exec=		io(console)
-	}
+	io_add(cpu, CPU),
+	io_add(console, CONSOLE)
 };
