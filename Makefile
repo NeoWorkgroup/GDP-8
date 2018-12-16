@@ -15,7 +15,7 @@ assembler: asm/asm.o
 	$(CC) $(LDFLAGS) asm/asm.o -o assembler
 
 asmlex: asm/gdp8.c
-	$(CC) $(CFLAGS) asm/gdp8.c -o asmlex -ll
+	$(CC) $(CFLAGS) asm/gdp8.c -o asmlex -lfl
 
 hex2bin: asm/hex2bin.o
 	$(CC) $(LDFLAGS) asm/hex2bin.o -o hex2bin
