@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 
-int input=0;
+unsigned int input=0;
 FILE *corefile;
 
 void parsearg(int argc, char **argv)

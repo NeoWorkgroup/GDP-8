@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <signal.h>
-#include "libgdp8.h"
+#include "cpu.h"
 
 struct CPU *cpu;
 FILE	*corefile;

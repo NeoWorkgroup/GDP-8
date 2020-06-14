@@ -7,15 +7,14 @@
 .DEF	X0	RF0
 .ORG	$100			; Starting Address (Hex)
 START:	CLR
+	LI	%A, #0		; Intermediate
 	LOAD	W, %A, TEMP	; Normal
 	LOAD	W, %A, TEMP:%X0	; Indexed
-	LI	%A, #0		; Intermediate
-	HLT
 COUNT:	CLR			; Clear all flag
 LOOP:	INC	%A		; Increment, if result is 0, set Z flag
 	IO	CPU, DPY, %A	; Display data
-	JR	Z, $CONT	; Relative condition jump (signed integer)
-	JR	X, $LOOP	; Unconditionally relative jump
+	JR	Z, CONT		; Relative condition jump (signed integer)
+	JR	X, LOOP		; Unconditionally relative jump
 CONT:	J	@NOPE		; @ means indirect access
 	JR	X, @NOPE	; Same effect as above
 

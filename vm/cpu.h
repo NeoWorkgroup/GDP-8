@@ -268,6 +268,9 @@ enum CPU_INTERRUPT
 
 #define ADDRMASK	((1 << 24) - 1)
 
+extern struct Handler handler[256];
+extern struct IOHandler iohandler[256];
+
 /* Global Functions */
 void panic(const char *msg);
 int fetch(memory_t *memory, struct Instruction *inst);

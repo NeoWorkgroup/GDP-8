@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
-#include <libgdp8.h>
+#include <cpu.h>
 
 int main(void)
 {
